@@ -100,7 +100,6 @@ $cal = new Calendar($_GET['date']);
 $cal->addEvent('event 1');
 $cal->addEvent('event 2', 10);
 $cal->addEvent('event 3', 10, 10);
-$cal->addEvent('event 4', 22, 05, 2015);
 $cal->makeCalendar();
 $cal->makeEvents();
 ?>
