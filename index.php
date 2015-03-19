@@ -1,25 +1,30 @@
 <?php
-include('login.php');
+
+include($_SERVER['DOCUMENT_ROOT'].'/project/controller/login.php');
+
 ?>
+
 <!DOCTYPE html>
 <html>
 <head>
 	<title>UUJ Electronic Noticeboard</title>
-	<link href="css/style.css" rel="stylesheet" type="text/css">
+	<link href="/project/style/style.css" rel="stylesheet" type="text/css">
 </head>
-<body>
+<body class="login">
 	<div id="main">
-		<h1>Login to UUJ Electronic Noticeboard</h1>
-		<div id="login">
-			<h2>Login Form</h2>
+		<div id="login_form">
+			<img src="/project/images/logo.png" id="login_logo"/>
+			<h1>Login to UUJ Electronic Noticeboard</h1>
+			<?php echo $error; ?>
 			<form action="" method="post">
-				<label>Username:</label>
-				<input id="username" name="username" placeholder="username" type="text">
-				<label>Password:</label>
-				<input id="password" name="password" placeholder="********" type="password">
+				<input id="username" name="username" placeholder="Username" type="text" required>
+				<input id="password" name="password" placeholder="********" type="password" required>
 				<input name="submit" type="submit" value="Login">
-				<span><?php echo $error; ?></span>
 			</form>
+
+			<div class="login-help">
+			   	<a href="#">Forgot Password</a>
+			</div>
 		</div>
 	</div>
 </body>
