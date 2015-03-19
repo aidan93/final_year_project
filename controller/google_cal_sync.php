@@ -48,7 +48,7 @@ if($quick_check !== 0) {
 		if($client->isAccessTokenExpired()) {
 			$client->refreshToken($token_refresh);
 	        $newtoken = $client->getAccessToken();
-	        $tokenupdate = "UPDATE oauth_token SET access_token = '$newtoken' WHERE refresh_token = '$token_refresh'";
+	        $tokenupdate = "UPDATE oauth_token SET access_token = '$newtoken' WHERE refresh_token = '$token_refresh' AND staff_id = '$token_user'";
 	        mysqli_query($connect, $tokenupdate) or die (mysqli_error($connect));
 
 	        $replacement = array('access_token'=>$newtoken);
@@ -75,15 +75,34 @@ if($quick_check !== 0) {
 
 			  	$staff = $token_user;
 				$date = $dt->format('Y-m-d');
-				$start = $dt->format('H:i:s');
-				$end = $dt_end->format('H:i:s');
 
-				$check_events = "SELECT event_date, start_time, end_time FROM events WHERE staff_id = '$staff' AND event_date = '$date' AND start_time = '$start' AND end_time = '$end'";
-				$event_check = mysqli_query($connect, $check_events) or die (mysqli_error($connect));
-				if(mysqli_num_rows($event_check) === 0) {
-					$add_event = "INSERT INTO events (staff_id, event_date, start_time, end_time, location, status) VALUES ('$staff', '$date', '$start', '$end', '$location', 0)";
-					$query = mysqli_query($connect, $add_event) or die (mysqli_error($connect));
-				}
+			  	$t1 = strtotime($event->start->dateTime);
+			  	$t2 = strtotime($event->end->dateTime);
+			  	$timeslots = array();
+
+			  	while($t1 < $t2) {
+			  		$timeslots[] = $t1;
+			  		$t1 = strtotime('+30 minutes', $t1);
+			  	}
+
+			  	foreach($timeslots as $slot) {
+			  		//get start time of 30 min slot and add 30 min to it to get end time
+			  		$start = $slot;
+			  		$end = strtotime('+30 minutes', $slot);
+
+			  		//convert times to readable times and insert to database
+			  		$start = date('H:i:s', $start);
+			  		$end = date('H:i:s', $end);
+
+			  		$check_events = "SELECT event_date, start_time, end_time FROM events WHERE staff_id = '$staff' AND event_date = '$date' AND start_time <= '$start' AND end_time > '$start'";
+					$event_check = mysqli_query($connect, $check_events) or die (mysqli_error($connect));
+
+					//if there is no results from the query then insert new event to database
+					if(mysqli_num_rows($event_check) === 0) {
+						$add_event = "INSERT INTO events (staff_id, event_date, start_time, end_time, location, status) VALUES ('$staff', '$date', '$start', '$end', '$location', 0)";
+						$query = mysqli_query($connect, $add_event) or die (mysqli_error($connect));
+					}
+			  	}
 			}
 		  }
 		  $pageToken = $events->getNextPageToken();

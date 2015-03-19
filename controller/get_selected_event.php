@@ -35,6 +35,7 @@ if($selected_start_init && $selected_end_init) {
 			$staff = $result['staff_id'];
 			$title = $result['event_title'];
 			$location = $result['location'];
+			$des = $result['description'];
 		}
 
 		//Get staff members full name
@@ -60,7 +61,7 @@ if($selected_start_init && $selected_end_init) {
 		$form .= "<li class='form_row'><label for='start-time' class='form_title'>Event Start Time:</label><input type='text' name='start-time' value='" . $selected_start_init . "' readonly='readonly'></li>";
 		$form .= "<li class='form_row'><label for='end-time' class='form_title'>Event End Time:</label><input type='text' name='end-time' value='" . $selected_end_init . "' readonly='readonly'></li>";
 		$form .= "<li class='form_row'><label for='location' class='form_title'>location: </label><input type='text' name='location' value='" . $location . "' readonly='readonly'></li>";
-		$form .= "<li class='form_row'><label for='description' class='form_title'>Description:</label><textarea name='description' cols='40' rows='6' required></textarea></li>";
+		$form .= "<li class='form_row'><label for='description' class='form_title'>Description:</label><textarea name='description' cols='40' rows='6' required>" . $des . "</textarea></li>";
 		
 		$form .= "<input type='submit'></form>";
 
