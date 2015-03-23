@@ -151,7 +151,7 @@ h1, h2, h3, h4, h5, p, a, textarea, input, button {
 	width: 100%;
 	float: left;
 	border-bottom: 1px solid #BFBFBF;
-	padding: 10px;
+	padding: 10px 8px;
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
@@ -313,7 +313,7 @@ input[type="submit"]:hover,
 #popup .form_row input,
 #popup .form_row textarea {
 	height: 35px; 
-    padding: 5px 8px;
+    padding: 5px 30px 5px 8px;
     width: 50%;
     float: left;
     border:1px solid #aaa;
@@ -448,8 +448,16 @@ input[type="submit"]:hover,
 }
 
 /* Event listing view button */
-#event_times .timeslot .view_event {
+#event_times .timeslot .view_event,
+#event_times .timeslot .delete_event {
 	margin-top: 0;
+}
+#event_times .timeslot .delete_event {
+	background: #FF4747;
+	margin-left: 10px;
+}
+#event_times .timeslot .delete_event:hover {
+	background: #FF1919;
 }
 
 /* Staff Controls */

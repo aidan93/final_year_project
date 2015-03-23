@@ -21,21 +21,25 @@ if($selected_start_init && $selected_end_init) {
 	$selected_start = date('H:i:s', $selected_start);
 	$selected_end = date('H:i:s', $selected_end);
 
-	$sql = "SELECT * FROM events WHERE staff_id = '$user_profile' OR student_id = '$user_profile' AND event_date = '$date' AND start_time = '$selected_start' AND end_time = '$selected_end'";
+	if(strpos($user_profile, "b00") !== false) {
+		$sql = "SELECT * FROM events WHERE student_id = '$user_profile' AND event_date = '$date' AND start_time = '$selected_start' AND end_time = '$selected_end'";
+	} else {
+		$sql = "SELECT * FROM events WHERE staff_id = '$user_profile' AND event_date = '$date' AND start_time = '$selected_start' AND end_time = '$selected_end'";
+	}
 	$query = mysqli_query($connect, $sql);
 
 	if(mysqli_num_rows($query) > 0) {
 
 		while ($result = mysqli_fetch_assoc($query)) {
 
-			//if user is not a student then get student from event table
-			if(strpos($user_check, "b00") === false && isset($result['student_id'])) {
+			//if student id is available then get student_id, title and description
+			if(isset($result['student_id'])) {
 				$student = $result['student_id'];
+				$title = $result['event_title'];
+				$des = $result['description'];
 			}
 			$staff = $result['staff_id'];
-			$title = $result['event_title'];
 			$location = $result['location'];
-			$des = $result['description'];
 		}
 
 		//Get staff members full name

@@ -6,8 +6,6 @@ include($_SERVER['DOCUMENT_ROOT'].'/project/controller/google_cal_connect.php');
 //Get the user ID of profile
 if(isset($_GET["user"])) {
 	$user_profile = $_GET["user"];
-} else {
-	$user_profile = $_SESSION["login_user"];
 }
 
 ?>

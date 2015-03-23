@@ -54,7 +54,9 @@
 						**
 						** or if current profile is logged in user then check for status 1 and show user's events
 						*/
-						if(($status == 0 && $_SESSION['login_user'] !== $user_profile) || ($status == 1 && $_SESSION['login_user'] == $user_profile)) {
+						if(($status == 0 && $_SESSION['login_user'] !== $user_profile && strpos($_SESSION['login_user'], "b00") !== false) || 
+							($status == 0 && $_SESSION['login_user'] === $user_profile && strpos($_SESSION['login_user'], "b00") === false) || 
+							($status == 1 && $_SESSION['login_user'] === $user_profile)) {
 							$slots++;
 						}
 					}

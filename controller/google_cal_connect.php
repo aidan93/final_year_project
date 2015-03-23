@@ -37,8 +37,8 @@ if(isset($_SESSION['login_user']) && strpos($_SESSION['login_user'], "b00") === 
 		$sql = "INSERT INTO oauth_token (access_token, token_type, expires_in, refresh_token, created, staff_id) VALUES ('$token_access', '$token_type', '$token_expire', '$token_refresh', '$token_created', '$token_user')";
 		$query = mysqli_query($connect, $sql) or die (mysqli_error($connect));
 		
-		// $redirect = 'http://' . $_SERVER['HTTP_HOST'] . "/project/views/profile.php?user=" . $_SESSION['login_user'];
-		// header('Location: ' . filter_var($redirect, FILTER_SANITIZE_URL));
+		$redirect = 'http://' . $_SERVER['HTTP_HOST'] . "/project/views/profile.php?user=" . $_SESSION['login_user'];
+		header('Location: ' . filter_var($redirect, FILTER_SANITIZE_URL));
 	}
 
 	$user = $_SESSION['login_user'];

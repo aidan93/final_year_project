@@ -19,7 +19,7 @@ if(strpos($_SESSION['login_user'], "b00") !== false) {
 
 	if($_SESSION['login_user'] === $user_profile) {
 
-		$sql = "SELECT * FROM events WHERE staff_id = '$user_profile' AND event_date = '$date' AND status = 1";
+		$sql = "SELECT * FROM events WHERE staff_id = '$user_profile' AND event_date = '$date'";
 	}
 }
 
@@ -52,7 +52,7 @@ foreach($startTimes as $key => $value)
 	if(strpos($_SESSION['login_user'], "b00") !== false && $_SESSION['login_user'] !== $user_profile) {
 		echo "<div class='timeslot' data-user-profile=".$user_profile." data-date=".$date."><span class='start_time'>".$value."</span><span class='end_time'>".$endTimes[$key]."</span><a class='choose_time'></a></div>";
 	} else {
-		echo "<div class='timeslot' data-user-profile=".$user_profile." data-date=".$date."><span class='start_time'>".$value."</span><span class='end_time'>".$endTimes[$key]."</span><button type='button' class='view_event'>View</a></div>";
+		echo "<div class='timeslot' data-user-profile=".$user_profile." data-date=".$date."><span class='start_time'>".$value."</span><span class='end_time'>".$endTimes[$key]."</span><button type='button' class='delete_event'>Delete</button><button type='button' class='view_event'>View</button></div>";
 	}
 }
 

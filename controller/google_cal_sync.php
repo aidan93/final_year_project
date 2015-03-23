@@ -70,6 +70,7 @@ if($quick_check !== 0) {
 
 		  	//only add any events that specify free time 
 		  	if (strpos(strtolower($event->getSummary()), 'free') !== false) {
+		  		$gcal_id = $event->getId();
 			  	$dt = new DateTime($event->start->dateTime);
 			  	$dt_end = new DateTime($event->end->dateTime);
 
@@ -99,7 +100,7 @@ if($quick_check !== 0) {
 
 					//if there is no results from the query then insert new event to database
 					if(mysqli_num_rows($event_check) === 0) {
-						$add_event = "INSERT INTO events (staff_id, event_date, start_time, end_time, location, status) VALUES ('$staff', '$date', '$start', '$end', '$location', 0)";
+						$add_event = "INSERT INTO events (staff_id, event_date, start_time, end_time, location, cal_event_id, status) VALUES ('$staff', '$date', '$start', '$end', '$location', '$gcal_id', 0)";
 						$query = mysqli_query($connect, $add_event) or die (mysqli_error($connect));
 					}
 			  	}

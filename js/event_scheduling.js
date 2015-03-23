@@ -4,7 +4,7 @@ $(document).ready(function() {
 	$("#popup").hide();
 
 	//when timeslot is chosen, apply the class 'selected' to element
-	$(".timeslot .choose_time, .timeslot .view_event").click(function(event){
+	$(".timeslot .choose_time, .timeslot .view_event, .timeslot .delete_event").click(function(event){
 
 		if($(this).parent().hasClass('selected')) {
 			$(this).parent().removeClass('selected');
@@ -44,6 +44,33 @@ $(document).ready(function() {
 	        console.log(error);
 	      }
 		});
+	});
+
+	/*
+	** when user clicks the delete button the event details are used to delete the event form the database
+	** and google calendar
+	*/
+	$(".delete_event").click(function(event){
+		if (confirm('Are you sure you want to delete this event?')) {
+           $.ajax({
+			  type: 'POST',
+			  url: '/project/controller/delete_event.php',
+			  data: {
+			  	user: $(".timeslot.selected").attr('data-user-profile'), 
+			  	date: $(".timeslot.selected").attr('data-date'),
+			  	selected_start: $(".timeslot.selected .start_time").text(),
+			  	selected_end: $(".timeslot.selected .end_time").text()
+			  },
+			  success: function(data){
+		        document.location.href = data;
+		      },
+		      error: function(xhr, status, error){
+		        console.log(error);
+		      }
+			});
+	    } else {
+           return false;
+	    }
 	});
 
 	//close popup when X is clicked
