@@ -7,46 +7,24 @@ $user = mysqli_real_escape_string($connect, $_POST['user']);
 $date = mysqli_real_escape_string($connect, $_POST['date']);
 $selected_start_init = mysqli_real_escape_string($connect, $_POST['selected_start']);
 $selected_end_init = mysqli_real_escape_string($connect, $_POST['selected_end']);
+$delay = mysqli_real_escape_string($connect, $_POST['delay']);
 
 if($selected_start_init && $selected_end_init) {
 
-	//format time to delete event from Google Cal and Database
+	//format time to delay event from Google Cal and Database
+	$new_start = strtotime('+' . $delay . ' minutes', strtotime($selected_start_init));
+	$new_start = date('H:i:s', $new_start);
+
 	$start_time = strtotime($selected_start_init);
 	$end_time = strtotime($selected_end_init);
 	$start_time = date('H:i:s', $start_time);
 	$end_time = date('H:i:s', $end_time);
 
-	//if event is being deleted from student page then get staff id from database to delete event from staff Google Cal
-	if(strpos($user, "b00") !== false) {
-		$sql = "SELECT staff_id, cal_event_id FROM events WHERE student_id = '$user' AND event_date = '$date' AND start_time = '$start_time' AND end_time = '$end_time'";
-		$gcalid_query = mysqli_query($connect, $sql);
+	$sql = "UPDATE events SET start_time = '$new_start' WHERE staff_id = '$user' AND event_date = '$date' AND start_time = '$start_time' AND end_time = '$end_time'";
+	$query = mysqli_query($connect, $sql) or die (mysqli_error($connect));
 
-		if(mysqli_num_rows($gcalid_query) > 0) {
-			$row = mysqli_fetch_assoc($gcalid_query);
-			$staff_id = $row['staff_id'];
-			$gcal_id = $row['cal_event_id'];
-		}
-	} else {
-		$sql = "SELECT cal_event_id FROM events WHERE staff_id = '$user' AND event_date = '$date' AND start_time = '$start_time' AND end_time = '$end_time'";
-		$gcalid_query = mysqli_query($connect, $sql);
+	if($query) {
 
-		if(mysqli_num_rows($gcalid_query) > 0) {
-			$row = mysqli_fetch_assoc($gcalid_query);
-			$gcal_id = $row['cal_event_id'];
-		}
-	}
-
-	if(strpos($user, "b00") !== false) {
-		$sql = "DELETE FROM events WHERE staff_id = '$staff_id' AND event_date = '$date' AND start_time = '$start_time' AND end_time = '$end_time'";
-	} else {
-		$sql = "DELETE FROM events WHERE staff_id = '$user' AND event_date = '$date' AND start_time = '$start_time' AND end_time = '$end_time'";
-	}
-
-	$delete_query = mysqli_query($connect, $sql) or die (mysqli_error($connect));
-
-	//if delete query successful then delete from google calendar as well
-	if($delete_query) {
-		
 		$scriptUri = 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'];
 
 		$client = new Google_Client();
@@ -58,15 +36,11 @@ if($selected_start_init && $selected_end_init) {
 
 		$client->setScopes(array('https://www.googleapis.com/auth/calendar'));
 
-		if(strpos($user, "b00") !== false) {
-			$sql = "SELECT * FROM oauth_token WHERE staff_id = '$staff_id'";
-		} else {
-			$sql = "SELECT * FROM oauth_token WHERE staff_id = '$user'";
-		}
+		$sql = "SELECT * FROM oauth_token WHERE staff_id = '$user'";
 		
 		$query = mysqli_query($connect, $sql) or die (mysqli_error($connect));
 
-		// Run a quick check to verify there are any results
+		// Run a quick check to verify if this user has their gcal linked
 		$quick_check = mysqli_num_rows($query);
 
 		if($quick_check !== 0) {
@@ -97,9 +71,23 @@ if($selected_start_init && $selected_end_init) {
 
 			$service = new Google_Service_Calendar($client);
 
-			$sql = "SELECT event_id FROM events WHERE cal_event_id = '$gcal_id'";
-			$gcal_query = mysqli_query($connect, $sql);
 
+			//Get gcal id after update
+			$sql = "SELECT cal_event_id FROM events WHERE staff_id = '$user' AND event_date = '$date' AND start_time = '$new_start' AND end_time = '$end_time'";
+			$gcalid_query = mysqli_query($connect, $sql);
+
+			if(mysqli_num_rows($gcalid_query) > 0) {
+				$row = mysqli_fetch_assoc($gcalid_query);
+				$gcal_id = $row['cal_event_id'];
+
+				//Check if there is more than one slot with the same gcal id
+				$sql = "SELECT event_id FROM events WHERE cal_event_id = '$gcal_id'";
+				$gcal_query = mysqli_query($connect, $sql);
+			}
+
+			/* if there is more than one slot with the same gcal id then check if it is the starting slot or a slot
+			** in the middle of the free time slot
+			*/
 			if(mysqli_num_rows($gcal_query) > 1) {
 
 				$event = $service->events->get('primary', $gcal_id);
@@ -112,11 +100,8 @@ if($selected_start_init && $selected_end_init) {
 				$gcal_start_time = date('H:i:s', $gcal_start_time);
 				$gcal_end_time = date('H:i:s', $gcal_end_time);
 
-				//if slot is at the beginning of the free time event then make start time of free time event the end time of slot
 				if($start_time === $gcal_start_time) {
-					$start = strtotime('+30 minutes', strtotime($start_time));
-					$start = date('H:i:s', $start);
-					$gcal_start_time = $date . 'T' . $start;
+					$gcal_start_time = $date . 'T' . $new_start;
 
 					$start = new Google_Service_Calendar_EventDateTime();
 					$start->setTimeZone('Europe/London');
@@ -128,16 +113,17 @@ if($selected_start_init && $selected_end_init) {
 					} catch (Google_Service_Exception $e) {
 						echo "An error has occurred with a Google Calendar request. Please return to the homepage. <br><br> <a href='/project/index.php'>Return Home</a>";
 					}
-					
-				} else if($end_time === $gcal_end_time) { 
-					//if slot is at the end of the free time event then make end time of free time event the start time of slot
-					$end = strtotime('-30 minutes', strtotime($end_time));
-					$end = date('H:i:s', $end);
-					$gcal_end_time = $date . 'T' . $end;
+				} else {
+					/*
+					** if slot is in the middle of the free time slot then make end time of free time event the start time of that slot
+					** then create a new free time event that starts at the new start time of slot and ends at the original end time of gcal event
+					*/
+					$old_gcal_end_time = $date . 'T' . $start_time;
+					$title = $event->getSummary();
 
 					$end = new Google_Service_Calendar_EventDateTime();
 					$end->setTimeZone('Europe/London');
-					$end->setDateTime($gcal_end_time);
+					$end->setDateTime($old_gcal_end_time);
 					$event->setEnd($end);
 
 					try {
@@ -146,36 +132,17 @@ if($selected_start_init && $selected_end_init) {
 						echo "An error has occurred with a Google Calendar request. Please return to the homepage. <br><br> <a href='/project/index.php'>Return Home</a>";
 					}
 
-				} else {
-					/*
-					** if slot is in the middle of the free time slot then make start time of free time event the end time of that slot
-					** then create a new free time event that starts at the initial free time event time and ends at this slots start time
-					*/
-					$gcal_start_time = $date . 'T' . $end_time;
-					$title = $event->getSummary();
-
-					$start = new Google_Service_Calendar_EventDateTime();
-					$start->setTimeZone('Europe/London');
-					$start->setDateTime($gcal_start_time);
-					$event->setStart($start);
-
-					try {
-						$updatedEvent = $service->events->update('primary', $event->getId(), $event);
-					} catch (Google_Service_Exception $e) {
-						echo "An error has occurred with a Google Calendar request. Please return to the homepage. <br><br> <a href='/project/index.php'>Return Home</a>";
-					}
-
-					$new_gcal_end_time = $date . 'T' . $start_time;
+					$new_gcal_start_time = $date . 'T' . $new_start;
 
 					$event = new Google_Service_Calendar_Event();
 					$event->setSummary($title);
 					$start = new Google_Service_Calendar_EventDateTime();
 					$start->setTimeZone('Europe/London');
-					$start->setDateTime($gcal_start);
+					$start->setDateTime($new_gcal_start_time);
 					$event->setStart($start);
 					$end = new Google_Service_Calendar_EventDateTime();
 					$end->setTimeZone('Europe/London');
-					$end->setDateTime($new_gcal_end_time);
+					$end->setDateTime($gcal_end);
 					$event->setEnd($end);
 
 					try {
@@ -187,25 +154,28 @@ if($selected_start_init && $selected_end_init) {
 					if(isset($createdEvent)) {
 						$gcal_id = $createdEvent->getId();
 
-						$update_events = "UPDATE events SET cal_event_id = '$gcal_id' WHERE staff_id = '$token_user' AND event_date = '$date' AND start_time <= '$gcal_start_time' AND end_time >= '$end_time'";
+						$update_events = "UPDATE events SET cal_event_id = '$gcal_id' WHERE staff_id = '$token_user' AND event_date = '$date' AND start_time <= '$new_start' AND end_time >= '$gcal_end_time'";
 						$update = mysqli_query($connect, $update_events) or die (mysqli_error($connect));
 					}
 
 				}
-
 			} else {
+				$gcal_start_time = $date . 'T' . $new_start;
+
+				$start = new Google_Service_Calendar_EventDateTime();
+				$start->setTimeZone('Europe/London');
+				$start->setDateTime($gcal_start_time);
+				$event->setStart($start);
 
 				try {
-					$service->events->delete('primary', $gcal_id);
+					$updatedEvent = $service->events->update('primary', $event->getId(), $event);
 				} catch (Google_Service_Exception $e) {
 					echo "An error has occurred with a Google Calendar request. Please return to the homepage. <br><br> <a href='/project/index.php'>Return Home</a>";
 				}
 			}
-				
-			
-			echo "/project/views/event_confirmation.php?status=Cancelled&date=" . $date . "&start=" . $start_time . "&end=" . $end_time;
-		}
 
+			echo "/project/views/event_confirmation.php?status=Delayed&date=" . $date . "&start=" . $start_time . "&delay=" . $delay;
+		}
 	}
 }
 

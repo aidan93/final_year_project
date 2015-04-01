@@ -187,7 +187,8 @@ h1, h2, h3, h4, h5, p, a, textarea, input, button {
 
 button,
 input[type="submit"],
-#logout a {
+#logout a,
+a.button {
 	float: right;
 	margin-top: 10px;
 	background: #bba461;
@@ -202,11 +203,13 @@ input[type="submit"],
     padding: 6px 10px;
     text-align: center;
     font-size: 0.7em;
+    text-decoration: none;
 }
 
 button:hover,
 input[type="submit"]:hover,
-#logout a:hover {
+#logout a:hover,
+a.button:hover {
 	cursor: pointer;
 	background: #b39a4f;
 }
@@ -363,16 +366,8 @@ input[type="submit"]:hover,
 
 
 #popup form input[type="submit"]:hover {
-    opacity:.85;
+   	background: #b39a4f;
     cursor: pointer; 
-}
-#popup form input[type="submit"]:active {
-    border: 1px solid #20911e;
-    box-shadow: 0 0 10px 5px #356b0b inset; 
-    -webkit-box-shadow:0 0 10px 5px #356b0b inset ;
-    -moz-box-shadow: 0 0 10px 5px #356b0b inset;
-    -ms-box-shadow: 0 0 10px 5px #356b0b inset;
-    -o-box-shadow: 0 0 10px 5px #356b0b inset;
 }
 
 /* Header Styling */
@@ -449,7 +444,8 @@ input[type="submit"]:hover,
 
 /* Event listing view button */
 #event_times .timeslot .view_event,
-#event_times .timeslot .delete_event {
+#event_times .timeslot .delete_event,
+#event_times .timeslot .delay_event {
 	margin-top: 0;
 }
 #event_times .timeslot .delete_event {
@@ -458,6 +454,36 @@ input[type="submit"]:hover,
 }
 #event_times .timeslot .delete_event:hover {
 	background: #FF1919;
+}
+
+#event_times .timeslot .delay_event {
+	margin-left: 10px;
+}
+
+/* Timeslot selectbox */
+#event_times .timeslot select {
+	float: right;
+	background: #1a2a4f url('/project/images/dropdown.png') no-repeat 95%;
+	border: none;
+	-webkit-appearance: none;
+    -moz-appearance: none;
+    -ms-appearance: none;
+    -o-appearance: none;
+    appearance: none;
+    border-radius: 3px;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    -ms-border-radius: 3px;
+    -o-border-radius: 3px;
+    color: white;
+    font-weight: bold;
+    padding: 6px 30px 6px 10px;
+    text-align: center;
+    font-size: 0.75em;
+    outline: none;
+}
+#event_times .timeslot select:hover {
+	cursor: pointer;
 }
 
 /* Staff Controls */
@@ -577,4 +603,8 @@ body.login {
 	clear: both;
 	color: #FF3333;
 	margin: 10px 0 20px;
+}
+
+#delay_button {
+	margin-right: 10px;
 }

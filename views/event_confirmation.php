@@ -17,7 +17,7 @@ if(isset($_GET['status'])) {
 	}
 
 	if(isset($_GET['mins'])) {
-		$delay_mins = $_GET['mins'];
+		$delay_mins = $_GET['delay'];
 	}
 }
 

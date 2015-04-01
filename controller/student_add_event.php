@@ -125,10 +125,12 @@ if(strpos($user_check, "b00") !== false) {
 				if($client->isAccessTokenExpired()) {
 					$client->refreshToken($token_refresh);
 			        $newtoken = $client->getAccessToken();
-			        $tokenupdate = "UPDATE oauth_token SET access_token = '$newtoken' WHERE refresh_token = '$token_refresh' AND staff_id = '$token_user'";
+			        $token = json_decode($newtoken ,true);
+					$token_access = $token['access_token'];
+			        $tokenupdate = "UPDATE oauth_token SET access_token = '$token_access' WHERE refresh_token = '$token_refresh' AND staff_id = '$token_user'";
 			        mysqli_query($connect, $tokenupdate) or die (mysqli_error($connect));
 
-			        $replacement = array('access_token'=>$newtoken);
+			        $replacement = array('access_token'=>$token_access);
 			        $array = array_replace($array, $replacement);
 				}
 
@@ -152,7 +154,12 @@ if(strpos($user_check, "b00") !== false) {
 				$end->setTimeZone('Europe/London');
 				$end->setDateTime($gcal_end_time);
 				$event->setEnd($end);
-				$createdEvent = $service->events->insert('primary', $event);
+
+				try {
+					$createdEvent = $service->events->insert('primary', $event);
+				} catch (Google_Service_Exception $e) {
+					echo "An error has occurred with a Google Calendar request. Please return to the homepage. <br><br> <a href='/project/index.php'>Return Home</a>";
+				}
 
 				if(isset($createdEvent)) {
 					$gcal_id = $createdEvent->getId();
@@ -160,15 +167,6 @@ if(strpos($user_check, "b00") !== false) {
 					$query = mysqli_query($connect, $sql) or die (mysqli_error($connect));
 				}
 			}
-
-			// the message
-			$msg = "First line of text\nSecond line of text";
-
-			// use wordwrap() if lines are longer than 70 characters
-			$msg = wordwrap($msg,70);
-
-			// send email
-			mail("someone@example.com","My subject",$msg);
 
 		} else {
 			echo("Error: " . mysqli_error($connect));

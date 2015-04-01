@@ -57,15 +57,28 @@ if($selected_start_init && $selected_end_init) {
 		}
 
 		//Create form to display data and allow user to add more detail to event
-		$form = "<form action='/project/controller/student_add_event.php' method='post'>";
-		$form .= "<li class='form_row'><label for='staff' class='form_title'>Staff Member:</label><input type='text' name='staff' value='" . $staff . "' readonly='readonly'></li>";
-		$form .= "<li class='form_row'><label for='student' class='form_title'>Student:</label><input type='text' name='student' value='" . $student . "' readonly='readonly'></li>";
-		$form .= "<li class='form_row'><label for='title' class='form_title'>Event Title:</label><input type='text' name='title' value='" . $title . "' required></li>";
-		$form .= "<li class='form_row'><label for='date' class='form_title'>Event Date:</label><input type='text' name='date' value='" . date("d/m/Y", strtotime($date)) . "' readonly='readonly'></li>";
-		$form .= "<li class='form_row'><label for='start-time' class='form_title'>Event Start Time:</label><input type='text' name='start-time' value='" . $selected_start_init . "' readonly='readonly'></li>";
-		$form .= "<li class='form_row'><label for='end-time' class='form_title'>Event End Time:</label><input type='text' name='end-time' value='" . $selected_end_init . "' readonly='readonly'></li>";
-		$form .= "<li class='form_row'><label for='location' class='form_title'>location: </label><input type='text' name='location' value='" . $location . "' readonly='readonly'></li>";
-		$form .= "<li class='form_row'><label for='description' class='form_title'>Description:</label><textarea name='description' cols='40' rows='6' required>" . $des . "</textarea></li>";
+		if(strpos($user_check, "b00") !== false) {
+			$form = "<form action='/project/controller/student_add_event.php' method='post'>";
+			$form .= "<li class='form_row'><label for='staff' class='form_title'>Staff Member:</label><input type='text' name='staff' value='" . $staff . "' readonly='readonly'></li>";
+			$form .= "<li class='form_row'><label for='student' class='form_title'>Student:</label><input type='text' name='student' value='" . $student . "' readonly='readonly'></li>";
+			$form .= "<li class='form_row'><label for='title' class='form_title'>Event Title:</label><input type='text' name='title' value='" . $title . "' required></li>";
+			$form .= "<li class='form_row'><label for='date' class='form_title'>Event Date:</label><input type='text' name='date' value='" . date("d/m/Y", strtotime($date)) . "' readonly='readonly'></li>";
+			$form .= "<li class='form_row'><label for='start-time' class='form_title'>Event Start Time:</label><input type='text' name='start-time' value='" . $selected_start_init . "' readonly='readonly'></li>";
+			$form .= "<li class='form_row'><label for='end-time' class='form_title'>Event End Time:</label><input type='text' name='end-time' value='" . $selected_end_init . "' readonly='readonly'></li>";
+			$form .= "<li class='form_row'><label for='location' class='form_title'>location: </label><input type='text' name='location' value='" . $location . "' readonly='readonly'></li>";
+			$form .= "<li class='form_row'><label for='description' class='form_title'>Description:</label><textarea name='description' cols='40' rows='6' required>" . $des . "</textarea></li>";
+		} else {
+			$form = "<form action='/project/controller/staff_add_event.php' method='post'>";
+			$form .= "<li class='form_row'><label for='staff' class='form_title'>Staff Member:</label><input type='text' name='staff' value='" . $staff . "' readonly='readonly'></li>";
+			$form .= "<li class='form_row'><label for='student' class='form_title'>Student:</label><input type='text' name='student' value='" . $student . "' readonly='readonly'></li>";
+			$form .= "<li class='form_row'><label for='title' class='form_title'>Event Title:</label><input type='text' name='title' value='" . $title . "'></li>";
+			$form .= "<li class='form_row'><label for='date' class='form_title'>Event Date:</label><input type='text' name='date' value='" . date("d/m/Y", strtotime($date)) . "' readonly='readonly'></li>";
+			$form .= "<li class='form_row'><label for='start-time' class='form_title'>Event Start Time:</label><input type='text' name='start-time' value='" . $selected_start_init . "' readonly='readonly'></li>";
+			$form .= "<li class='form_row'><label for='end-time' class='form_title'>Event End Time:</label><input type='text' name='end-time' value='" . $selected_end_init . "' readonly='readonly'></li>";
+			$form .= "<li class='form_row'><label for='location' class='form_title'>location: </label><input type='text' name='location' value='" . $location . "'></li>";
+			$form .= "<li class='form_row'><label for='description' class='form_title'>Description:</label><textarea name='description' cols='40' rows='6'>" . $des . "</textarea></li>";
+			$form .= "<li class='form_row hidden'><input type='hidden' name='edit' value='edit'></li>";
+		}
 		
 		$form .= "<input type='submit'></form>";
 
