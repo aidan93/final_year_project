@@ -101,7 +101,7 @@ if($quick_check !== 0) {
 				  		$start = date('H:i:s', $start);
 				  		$end = date('H:i:s', $end);
 
-				  		$check_events = "SELECT event_date, start_time, end_time FROM events WHERE staff_id = '$staff' AND event_date = '$date' AND start_time <= '$start' AND end_time >= '$start'";
+				  		$check_events = "SELECT event_date, start_time, end_time FROM events WHERE staff_id = '$staff' AND event_date = '$date' AND start_time <= '$start' AND end_time >= '$end'";
 						$event_check = mysqli_query($connect, $check_events) or die (mysqli_error($connect));
 
 						//if there is no results from the query then insert new event to database
