@@ -33,6 +33,32 @@
 				echo "<tr>";
 			}
 
+			//Get the integer for the day of the week and add the string associated with that day to the date
+			$weekday = $i % 7;
+			switch($weekday) {
+				case "0":
+					$weekday = "Monday";
+					break;
+				case "1":
+					$weekday = "Tuesday";
+					break;
+				case "2":
+					$weekday = "Wednesday";
+					break;
+				case "3":
+					$weekday = "Thursday";
+					break;
+				case "4":
+					$weekday = "Friday";
+					break;
+				case "5":
+					$weekday = "Saturday";
+					break;
+				case "6":
+					$weekday = "Sunday";
+					break;
+			}
+
 			/* 
 			** if weekend then apply styling to indicate this
 			** else check if there are events available for this date
@@ -40,7 +66,7 @@
 			*/
 			if(($i % 7 ==6) || ($i % 7 ==5)) {
 
-				echo "<td class='weekend' data-date=".$date.">". $day ."</td>";
+				echo "<td class='weekend' data-date=".$date."><span class='date'>". $day ."</span><span class='weekday'>".$weekday."</span></td>";
 			} else {
 
 				if($quick_check != 0 && $date >= $today) {
@@ -48,7 +74,6 @@
 
 					while($row = mysqli_fetch_array($query, MYSQLI_ASSOC)) {
 						$status = $row['status'];
-						//$student = $row['student_id'];
 
 						/* if current profile is not logged in user then check for status 0 and show free events
 						**
@@ -63,14 +88,14 @@
 
 					if($slots > 0) {
 					
-						echo "<td class='available'><a href=/project/views/schedule_event.php?user=". $user_profile ."&date=". $date .">". $day ."</a></td>";
+						echo "<td class='available'><a href=/project/views/schedule_event.php?user=". $user_profile ."&date=". $date ."><span class='date'>". $day ."</span><span class='weekday'>".$weekday."</span></a></td>";
 					} else {
-						echo "<td class='unavailable'>". $day ."</td>";
+						echo "<td class='unavailable'><span class='date'>". $day ."</span><span class='weekday'>".$weekday."</span></td>";
 					}
 					
 				} else {
 					
-					echo "<td class='unavailable'>". $day ."</td>";
+					echo "<td class='unavailable'><span class='date'>". $day ."</span><span class='weekday'>".$weekday."</span></td>";
 				}
 			}
 			if(($i % 7) == 6 ) { 

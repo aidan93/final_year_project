@@ -8,6 +8,7 @@ include($_SERVER['DOCUMENT_ROOT'].'/project/controller/login.php');
 <html>
 <head>
 	<title>UU Electronic Noticeboard</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 	<link href="/project/style/style.css" rel="stylesheet" type="text/css">
 </head>
 <body class="login">
@@ -23,7 +24,7 @@ include($_SERVER['DOCUMENT_ROOT'].'/project/controller/login.php');
 			</form>
 
 			<div class="login-help">
-			   	<a href="#">Forgot Password</a>
+			   	<a href="https://login.ulster.ac.uk/password/">Forgot Password</a>
 			</div>
 		</div>
 	</div>

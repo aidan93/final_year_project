@@ -22,23 +22,27 @@ if(isset($_GET['status'])) {
 }
 
 ?>
+<!DOCTYPE html>
 <html>
 <head>
 	<title>Event Confirmation</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,700,400' rel='stylesheet' type='text/css'>
 	<link href="/project/style/style.css" rel="stylesheet" type="text/css">
 </head>
 <body>
 	<div id="header">
-		<a href="/project/index.php" id="logo"><img src="/project/images/logo.png" /></a>
 		<div id="profile">
 			<span id="welcome"><?php echo $login_session; ?></span>
 			<b id="logout"><a href="/project/views/logout.php">Log Out</a></b>
 		</div>
-		<form method="post" action="search.php" id="searchform"> 
-		    <input type="text" name="search_name" placeholder="Search Staff"> 
-		    <button type="submit"></button> 
-		</form> 
+		<a href="/project/index.php" id="logo"><img src="/project/images/logo.png" /></a>
+		<?php if(strpos($_SESSION['login_user'], "b00") !== false) { ?>
+			<form method="post" action="search.php" id="searchform"> 
+			    <input type="text" name="search_name" placeholder="Search Staff"> 
+			    <button type="submit"></button> 
+			</form> 
+		<?php } ?>
 	</div>
 	<div class="wrapper">
 		<div id="confirmation">

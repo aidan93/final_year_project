@@ -105,65 +105,88 @@ if(strpos($user_check, "b00") !== false) {
 
 			$client->setScopes(array('https://www.googleapis.com/auth/calendar'));
 
-			$sql = "SELECT * FROM oauth_token WHERE staff_id = '$staff'";
+			$sql = "SELECT * FROM oauth_token WHERE staff_id = '$staff' OR student_id = '$student'";
 			$query = mysqli_query($connect, $sql) or die (mysqli_error($connect));
 
 			// Run a quick check to verify there are any results
 			$quick_check = mysqli_num_rows($query);
 
 			if($quick_check !== 0) {
-				$row = mysqli_fetch_assoc($query);
-				$token_access = $row['access_token'];
-				$token_type = $row['token_type'];
-				$token_expire = $row['expires_in'];
-				$token_refresh = $row['refresh_token'];
-				$token_created = $row['created'];
-				$token_user = $row['staff_id'];
-				
-				$array = array('access_token'=>$token_access, 'token_type'=>$token_type, 'expires_in'=>$token_expire, 'refresh_token'=>$token_refresh, 'created'=>$token_created);
 
-				if($client->isAccessTokenExpired()) {
-					$client->refreshToken($token_refresh);
-			        $newtoken = $client->getAccessToken();
-			        $token = json_decode($newtoken ,true);
-					$token_access = $token['access_token'];
-			        $tokenupdate = "UPDATE oauth_token SET access_token = '$token_access' WHERE refresh_token = '$token_refresh' AND staff_id = '$token_user'";
-			        mysqli_query($connect, $tokenupdate) or die (mysqli_error($connect));
+				while($row = mysqli_fetch_assoc($query)) {
+					$token_access = $row['access_token'];
+					$token_type = $row['token_type'];
+					$token_expire = $row['expires_in'];
+					$token_refresh = $row['refresh_token'];
+					$token_created = $row['created'];
 
-			        $replacement = array('access_token'=>$token_access);
-			        $array = array_replace($array, $replacement);
-				}
+					if(!empty($row['staff_id'])) {
+						$token_user = $row['staff_id'];
+					} else if(!empty($row['student_id'])) {
+						$token_user = $row['student_id'];
+					}
+					
+					$array = array('access_token'=>$token_access, 'token_type'=>$token_type, 'expires_in'=>$token_expire, 'refresh_token'=>$token_refresh, 'created'=>$token_created);
 
-				$token = json_encode($array);
-				$client->setAccessToken($token);
+					if($client->isAccessTokenExpired()) {
+						$client->refreshToken($token_refresh);
+				        $newtoken = $client->getAccessToken();
+				        $token = json_decode($newtoken ,true);
+						$token_access = $token['access_token'];
+						
+						if(!empty($row['staff_id'])) {
+							$tokenupdate = "UPDATE oauth_token SET access_token = '$token_access' WHERE refresh_token = '$token_refresh' AND staff_id = '$token_user'";
+						} else if(!empty($row['student_id'])) {
+							$tokenupdate = "UPDATE oauth_token SET access_token = '$token_access' WHERE refresh_token = '$token_refresh' AND student_id = '$token_user'";
+						}
+				        
+				        mysqli_query($connect, $tokenupdate) or die (mysqli_error($connect));
 
-				$service = new Google_Service_Calendar($client);
+				        $replacement = array('access_token'=>$token_access);
+				        $array = array_replace($array, $replacement);
+					}
 
-				$gcal_start_time = $date . 'T' . $start_time;
-				$gcal_end_time = $date . 'T' . $end_time;
+					$token = json_encode($array);
+					$client->setAccessToken($token);
 
-				$student_name = mysqli_real_escape_string($connect, $_POST['student']);
+					$service = new Google_Service_Calendar($client);
 
-				$event = new Google_Service_Calendar_Event();
-				$event->setSummary('Meeting with ' . $student_name);
-				$start = new Google_Service_Calendar_EventDateTime();
-				$start->setTimeZone('Europe/London');
-				$start->setDateTime($gcal_start_time);
-				$event->setStart($start);
-				$end = new Google_Service_Calendar_EventDateTime();
-				$end->setTimeZone('Europe/London');
-				$end->setDateTime($gcal_end_time);
-				$event->setEnd($end);
+					$gcal_start_time = $date . 'T' . $start_time;
+					$gcal_end_time = $date . 'T' . $end_time;
 
-				try {
-					$createdEvent = $service->events->insert('primary', $event);
-				} catch (Google_Service_Exception $e) {
-					echo "An error has occurred with a Google Calendar request. Please return to the homepage. <br><br> <a href='/project/index.php'>Return Home</a>";
+					if(!empty($row['staff_id'])) {
+						$name = mysqli_real_escape_string($connect, $_POST['student']);
+					} else if(!empty($row['student_id'])) {
+						$name = mysqli_real_escape_string($connect, $_POST['staff']);
+					}
+
+					$event = new Google_Service_Calendar_Event();
+					if(isset($createdEvent)) {
+						$event->setId($gcal_id);
+					}
+					$event->setSummary('Meeting with ' . $name);
+					$start = new Google_Service_Calendar_EventDateTime();
+					$start->setTimeZone('Europe/London');
+					$start->setDateTime($gcal_start_time);
+					$event->setStart($start);
+					$end = new Google_Service_Calendar_EventDateTime();
+					$end->setTimeZone('Europe/London');
+					$end->setDateTime($gcal_end_time);
+					$event->setEnd($end);
+
+					try {
+						$createdEvent = $service->events->insert('primary', $event);
+					} catch (Google_Service_Exception $e) {
+						echo "An error has occurred with a Google Calendar request. Please return to the homepage. <br><br> <a href='/project/index.php'>Return Home</a>";
+					}
+
+					if(isset($createdEvent)) {
+						$gcal_id = $createdEvent->getId();
+					}
 				}
 
 				if(isset($createdEvent)) {
-					$gcal_id = $createdEvent->getId();
-					$sql = "UPDATE events SET cal_event_id = '$gcal_id' WHERE staff_id = '$token_user' AND event_date = '$date' AND start_time = '$start_time' AND end_time = '$end_time'";
+					$sql = "UPDATE events SET cal_event_id = '$gcal_id' WHERE staff_id = '$staff' AND event_date = '$date' AND start_time = '$start_time' AND end_time = '$end_time'";
 					$query = mysqli_query($connect, $sql) or die (mysqli_error($connect));
 				}
 			}

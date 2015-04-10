@@ -15,6 +15,20 @@ h1, h2, h3, h4, h5, p, a, textarea, input, button {
 	font-family: 'Open Sans', sans-serif;
 }
 
+input, button {
+	-webkit-appearance: none;
+}
+
+#logo {
+	float: left;
+}
+
+#logo::after {
+	display: table;
+	content: '';
+	clear: left;
+}
+
 .overlay {
 	display: none;
 	z-index: 9998;
@@ -30,26 +44,45 @@ h1, h2, h3, h4, h5, p, a, textarea, input, button {
 	margin: 20px 5%;
 }
 
+.table_wrapper {
+	display: block;
+	float: right;
+	clear: both;
+}
+
+.table_wrapper.staff_cal {
+	display: inline-block;
+	width: 45%;
+}
+
+.table_wrapper.student_cal {
+	width: 100%;
+	margin-top: 10px;
+}
+
 .clmonth {
 	border-collapse: collapse;
+	border-spacing: 0;
 	width: 100%;
+	white-space: nowrap;
 }
 
 .clmonth caption {
+	width: 100%;
 	font-weight: normal;
 	padding: 20px 0;
-	font-size: 3.8em;
+	font-size: 2.5em;
 	background: none repeat scroll 0% 0% #bba461;
 	border-radius: 30px 30px 0px 0px;
 	border-bottom: 1px solid #fff;
 	color: #fff;
-	height: 81px;
+	height: 55px;
 }
 
 .clmonth caption a {
 	display: block;
 	height: 100%;
-	width: 44px;
+	width: 35px;
 	background: url('/project/images/arrows.png') left no-repeat;
 }
 
@@ -64,24 +97,38 @@ h1, h2, h3, h4, h5, p, a, textarea, input, button {
 	background-position: right;
 }
 
+.clmonth tbody,
+.clmonth tr {
+	width: 100%;
+}
+
 .clmonth th {
+	width: 14.285%;
 	padding: 1.6em 0;
 	background-color: #1a2a4f;
 	color: #fff;
-	min-width: 8em;
 	box-shadow: 0 5px #bba461;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
 }
 
 .clmonth td {
+	width: 14.285%;
+	white-space: nowrap;
+ 	overflow: hidden;
 	border: 1px solid #fff;
-	padding: 0.8em 0;
 	text-align: center;
 	font-size: 2em;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
 }
 
 .clmonth td.previous, .clmonth td.next {
 	background-color: #f6f6f6; 
 	color: #c6c6c6;
+	min-height: 96px;
 }
 
 .clmonth ul {
@@ -107,6 +154,7 @@ h1, h2, h3, h4, h5, p, a, textarea, input, button {
 }
 
 .clmonth td.available a {
+	display: block;
 	color: #fff;
 	text-decoration: none;
 }
@@ -119,6 +167,15 @@ h1, h2, h3, h4, h5, p, a, textarea, input, button {
 .clmonth td.weekend {
 	background: #485572;
 	color: #fff;
+}
+
+.clmonth td span.date {
+	display: block;
+	padding: 0.5em 0;
+}
+
+.clmonth td span.weekday {
+	display: none;
 }
 
 #events #event_header {
@@ -134,6 +191,10 @@ h1, h2, h3, h4, h5, p, a, textarea, input, button {
 	display: inline-block;
 	width: 25%;
 	text-align: center;
+}
+
+#event_header #header_time {
+	display: none;
 }
 
 #event_times {
@@ -215,6 +276,7 @@ a.button:hover {
 }
 
 #logout {
+	display: inline-block;
 	margin-left: 10px;
 }
 
@@ -385,7 +447,7 @@ a.button:hover {
 #header #logo img {
 	display: block;
 	float: left;
-	width: 150px;
+	width: 180px;
 }
 
 /* Profile Header Styling */
@@ -396,6 +458,7 @@ a.button:hover {
 
 #profile #welcome {
 	display: inline-block;
+	float: left;
 	padding: 2.5px 0;
 }
 
@@ -457,7 +520,11 @@ a.button:hover {
 }
 
 #event_times .timeslot .delay_event {
-	margin-left: 10px;
+	border-radius: 0 3px 3px 0;
+    -webkit-border-radius: 0 3px 3px 0;
+    -moz-border-radius: 0 3px 3px 0;
+    -ms-border-radius: 0 3px 3px 0;
+    -o-border-radius: 0 3px 3px 0;
 }
 
 /* Timeslot selectbox */
@@ -470,17 +537,18 @@ a.button:hover {
     -ms-appearance: none;
     -o-appearance: none;
     appearance: none;
-    border-radius: 3px;
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
-    -ms-border-radius: 3px;
-    -o-border-radius: 3px;
+    border-radius: 3px 0 0 3px;
+    -webkit-border-radius: 3px 0 0 3px;
+    -moz-border-radius: 3px 0 0 3px;
+    -ms-border-radius: 3px 0 0 3px;
+    -o-border-radius: 3px 0 0 3px;
     color: white;
     font-weight: bold;
     padding: 6px 30px 6px 10px;
     text-align: center;
     font-size: 0.75em;
     outline: none;
+    margin-left: 10px;
 }
 #event_times .timeslot select:hover {
 	cursor: pointer;
@@ -607,4 +675,251 @@ body.login {
 
 #delay_button {
 	margin-right: 10px;
+}
+
+
+/* Google Connect Button */
+#google_login {
+	display: block;
+	float: right;
+	clear: right;
+	text-decoration: none;
+	color: #fff;
+	background: #3078f0 url('/project/images/google.png') no-repeat left;
+	padding: 5px 10px 5px 35px;
+	font-size: 0.8em;
+	border-radius: 3px;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    -ms-border-radius: 3px;
+    -o-border-radius: 3px;
+    margin-left: 10px;
+}
+
+/* User's Profile Header */
+#profile_header {
+	width: 100%;
+	text-align: center;
+	margin-top: 0;
+	margin-bottom: 10px;
+}
+
+/* Search Results */
+#search_results {
+	display: block;
+}
+
+.search_result {
+	display: block;
+	clear: both;
+	width: 100%;
+}
+
+.search_result a {
+	display: block;
+	padding: 10px 20px;
+	text-decoration: none;
+	color: #fff;
+	border-bottom: 2px solid #ddd;
+	background: #485572;
+}
+
+.search_result a:hover {
+	background: #1a2a4f;
+}
+
+.search_result:last-child a {
+	border-bottom: 0;
+}
+
+.search_result a::after {
+	display: table;
+	content: '';
+	clear: both;
+}
+
+.search_result .staff_name {
+	float: left;
+	display: inline-block;
+	width: 85%;
+}
+
+.search_result .room {
+	float: right;
+	display: inline-block;
+	width: 15%;
+	text-align: right;
+}
+
+@media (max-width: 979px) {
+	#login_form {
+		width: 50%;
+	}
+
+	.table_wrapper.staff_cal {
+		clear: both;
+		display: block;
+		width: 100%;
+	}
+
+	#popup {
+		width: 70%;
+		left: 15%;
+	}
+}
+
+@media (max-width: 768px) {
+	#login_form {
+		width: 60%;
+	}
+
+	#popup {
+		width: 80%;
+		left: 10%;
+	}
+
+	#event_header #header_starttime,
+	#event_header #header_endtime {
+		display: none;
+	}
+
+	#event_header #header_time {
+		display: block;
+		width: 20%;
+		text-align: center;
+	}
+
+	#event_times .timeslot .start_time, 
+	#event_times .timeslot .end_time {
+		display: block;
+		float: left;
+		clear: left;
+		width: 20%;
+	}
+
+	#event_times .timeslot .dash {
+		display: block;
+		float: left;
+		clear: left;
+		width: 20%;
+		text-align: center;
+	}
+
+	#event_times .timeslot .delete_event,
+	#event_times .timeslot select {
+		margin-left: 5px;
+	}
+
+	#events #event_times .timeslot .delay_event,
+	#events #event_times .timeslot .view_event,
+	#events #event_times .timeslot .delete_event,
+	#events #event_times .timeslot select,
+	#event_times .timeslot .choose_time {
+		margin-top: -25px;
+	}
+
+	.search_result .staff_name {
+		width: 75%;
+	}
+
+	.search_result .room {
+		width: 25%;
+	}
+
+}
+
+@media (max-width: 480px) {
+
+	#logo {
+		display: block;
+		float: none;
+		margin: 0 auto 20px auto;
+		clear: both;
+	}
+
+	#header #logo img {
+		display: block;
+		float: none;
+		margin: 0 auto;
+	}
+
+	#profile {
+		margin-bottom: 20px;
+	}
+
+	#profile_header {
+		margin-bottom: 25px;
+	}
+
+	#searchform {
+		display: block;
+		clear: both;
+		float: none;
+		width: 300px;
+		margin: 0 auto;
+	}
+
+	#searchform::after {
+		display: table;
+		content: '';
+		clear: both;
+	}
+
+	#searchform input[type=text] {
+		width: 260px;
+	}
+
+	#login_form {
+		width: 80%;
+		margin: 0;
+	}
+
+	#popup {
+		width: 100%;
+		left: 0;
+	}
+	.clmonth caption {
+		font-size: 1.6em;
+		padding: 10px 0;
+	}
+	.clmonth caption .month {
+		display: inline-block;
+		padding: 10px 0;
+	}
+	.clmonth tr:first-child {
+		display: none;
+	}
+	.clmonth td {
+		float: left;
+		display: block;
+		width: 100%;
+		font-size: 1.2em;
+		text-align: left;
+		padding: 10px;
+	}
+	.clmonth td a {
+		display: block;
+		width: 100%;
+		margin: -10px;
+		padding: 10px;
+	}
+	.clmonth td span.date {
+		padding: 0;
+		display: inline-block;
+		margin-right: 10px;
+	}
+	.clmonth td span.weekday {
+		display: inline-block;
+	}
+	.clmonth td.previous, .clmonth td.next {
+		display: none;
+	}
+
+	.search_result .staff_name {
+		width: 65%;
+	}
+
+	.search_result .room {
+		width: 35%;
+	}
 }

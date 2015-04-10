@@ -14,7 +14,8 @@ $client->setRedirectUri($scriptUri);
 
 $client->setScopes(array('https://www.googleapis.com/auth/calendar'));
 
-$sql = "SELECT * FROM oauth_token";
+//Get all the records for google calendars linked to staff
+$sql = "SELECT * FROM oauth_token WHERE staff_id IS NOT NULL";
 $query = mysqli_query($connect, $sql) or die (mysqli_error($connect));
 
 // Run a quick check to verify there are any results
@@ -101,7 +102,7 @@ if($quick_check !== 0) {
 				  		$start = date('H:i:s', $start);
 				  		$end = date('H:i:s', $end);
 
-				  		$check_events = "SELECT event_date, start_time, end_time FROM events WHERE staff_id = '$staff' AND event_date = '$date' AND start_time <= '$start' AND end_time >= '$end'";
+				  		$check_events = "SELECT event_date, start_time, end_time FROM events WHERE staff_id = '$staff' AND event_date = '$date' AND start_time <= '$start' AND end_time >= '$end' OR end_time = '$end'";
 						$event_check = mysqli_query($connect, $check_events) or die (mysqli_error($connect));
 
 						//if there is no results from the query then insert new event to database

@@ -46,13 +46,22 @@ while($row = mysqli_fetch_array($query, MYSQLI_ASSOC)) {
 asort($startTimes);
 asort($endTimes);
 
+//set up select box to display delay duration times
+$selectbox = "<select class='delay_times'><option value='0'>No Delay</option>";
+$selectbox .= "<option value='5'>5 Minutes</option>";
+$selectbox .= "<option value='10'>10 Minutes</option>";
+$selectbox .= "<option value='15'>15 Minutes</option>";
+$selectbox .= "<option value='20'>20 Minutes</option></select>";
+
 //for each individual time in array, print out the relevant information to screen
 foreach($startTimes as $key => $value)
 {
 	if(strpos($_SESSION['login_user'], "b00") !== false && $_SESSION['login_user'] !== $user_profile) {
-		echo "<div class='timeslot' data-user-profile=".$user_profile." data-date=".$date."><span class='start_time'>".$value."</span><span class='end_time'>".$endTimes[$key]."</span><a class='choose_time'></a></div>";
+		echo "<div class='timeslot' data-user-profile=".$user_profile." data-date=".$date."><span class='start_time'>".$value."</span><span class='dash'> - </span><span class='end_time'>".$endTimes[$key]."</span><a class='choose_time'></a></div>";
+	} else if(strpos($_SESSION['login_user'], "b00") !== false && $_SESSION['login_user'] === $user_profile) {
+		echo "<div class='timeslot' data-user-profile=".$user_profile." data-date=".$date."><span class='start_time'>".$value."</span><span class='dash'> - </span><span class='end_time'>".$endTimes[$key]."</span><button type='button' class='delete_event'>Delete</button><button type='button' class='view_event'>View</button></div>";
 	} else {
-		echo "<div class='timeslot' data-user-profile=".$user_profile." data-date=".$date."><span class='start_time'>".$value."</span><span class='end_time'>".$endTimes[$key]."</span><button type='button' class='delete_event'>Delete</button><button type='button' class='view_event'>View</button></div>";
+		echo "<div class='timeslot' data-user-profile=".$user_profile." data-date=".$date."><span class='start_time'>".$value."</span><span class='dash'> - </span><span class='end_time'>".$endTimes[$key]."</span><button type='button' class='delete_event'>Delete</button><button type='button' class='delay_event'>Delay</button>" . $selectbox . "<button type='button' class='view_event'>View</button></div>";
 	}
 }
 

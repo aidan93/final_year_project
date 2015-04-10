@@ -27,12 +27,13 @@ if($selected_start_init && $selected_end_init) {
 			$gcal_id = $row['cal_event_id'];
 		}
 	} else {
-		$sql = "SELECT cal_event_id FROM events WHERE staff_id = '$user' AND event_date = '$date' AND start_time = '$start_time' AND end_time = '$end_time'";
+		$sql = "SELECT student_id, cal_event_id FROM events WHERE staff_id = '$user' AND event_date = '$date' AND start_time = '$start_time' AND end_time = '$end_time'";
 		$gcalid_query = mysqli_query($connect, $sql);
 
 		if(mysqli_num_rows($gcalid_query) > 0) {
 			$row = mysqli_fetch_assoc($gcalid_query);
 			$gcal_id = $row['cal_event_id'];
+			$student = $row['student_id'];
 		}
 	}
 
@@ -199,6 +200,58 @@ if($selected_start_init && $selected_end_init) {
 					$service->events->delete('primary', $gcal_id);
 				} catch (Google_Service_Exception $e) {
 					echo "An error has occurred with a Google Calendar request. Please return to the homepage. <br><br> <a href='/project/index.php'>Return Home</a>";
+				}
+
+				//Get student ID from event if it exists
+				if(strpos($user, "b00") !== false) {
+					$student = $user;
+				}
+
+				//Delay event within student's google calendar
+				if(isset($student)) {
+					
+					$sql = "SELECT * FROM oauth_token WHERE student_id = '$student'";
+		
+					$query = mysqli_query($connect, $sql) or die (mysqli_error($connect));
+
+					// Run a quick check to verify if this user has their gcal linked
+					$quick_check = mysqli_num_rows($query);
+
+					if($quick_check !== 0) {
+
+						$row = mysqli_fetch_assoc($query);
+						$token_access = $row['access_token'];
+						$token_type = $row['token_type'];
+						$token_expire = $row['expires_in'];
+						$token_refresh = $row['refresh_token'];
+						$token_created = $row['created'];
+						$token_user = $row['student_id'];
+						
+						$array = array('access_token'=>$token_access, 'token_type'=>$token_type, 'expires_in'=>$token_expire, 'refresh_token'=>$token_refresh, 'created'=>$token_created);
+
+						if($client->isAccessTokenExpired()) {
+							$client->refreshToken($token_refresh);
+					        $newtoken = $client->getAccessToken();
+					        $token = json_decode($newtoken ,true);
+							$token_access = $token['access_token'];
+					        $tokenupdate = "UPDATE oauth_token SET access_token = '$token_access' WHERE refresh_token = '$token_refresh' AND student_id = '$token_user'";
+					        mysqli_query($connect, $tokenupdate) or die (mysqli_error($connect));
+
+					        $replacement = array('access_token'=>$token_access);
+					        $array = array_replace($array, $replacement);
+						}
+
+						$token = json_encode($array);
+						$client->setAccessToken($token);
+
+						$service = new Google_Service_Calendar($client);
+
+						try {
+							$service->events->delete('primary', $gcal_id);
+						} catch (Google_Service_Exception $e) {
+							echo "An error has occurred with a Google Calendar request. Please return to the homepage. <br><br> <a href='/project/index.php'>Return Home</a>";
+						}
+					}
 				}
 			}
 				
