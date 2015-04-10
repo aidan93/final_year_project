@@ -109,7 +109,7 @@ if(isset($_GET["user"])) {
 			<li class='form_row'><label for='title' class='form_title'>Event Title:</label><input type='text' name='title'></li>
 			<li class='form_row'><label for='date' class='form_title'>Event Date:</label><input type='text' name='date' id='datepicker' required></li>
 			<li class='form_row'><label for='start-time' class='form_title'>Event Start Time:</label><input type='time' name='start-time' id='start-time' required></li>
-			<li class='form_row'><label for='end-time' class='form_title'>Event End Time:</label><input type='time' name='end-time' id='end-time' required></li>
+			<li class='form_row'><label for='end-time' class='form_title'>Event End Time:</label><input type='time' name='end-time' id='end-time' step='1800' required></li>
 			<li class='form_row'><label for='location' class='form_title'>Location: </label><input type='text' name='location'></li>
 			<li class='form_row'><label for='description' class='form_title'>Description:</label><textarea name='description' cols='40' rows='6'></textarea></li>
 			

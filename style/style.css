@@ -635,8 +635,10 @@ body.login {
 }
 
 #login_form form input[type=submit] {
-	float: left;
-	width: 100%;
+	float: none;
+	display: block;
+	width: 200px;
+	margin: 0 auto;
 	clear: both;
 	text-align: center;
 	font-size: 1em;
