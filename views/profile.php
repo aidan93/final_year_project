@@ -1,6 +1,8 @@
 <?php
+
 include($_SERVER['DOCUMENT_ROOT'].'/project/controller/session.php');
 include($_SERVER['DOCUMENT_ROOT'].'/project/controller/calendar_setup.php');
+include($_SERVER['DOCUMENT_ROOT'].'/project/controller/google_cal_connect.php');
 
 //Get the user ID of profile
 if(isset($_GET["user"])) {
@@ -20,12 +22,15 @@ if(isset($_GET["user"])) {
 		$row = mysqli_fetch_assoc($query);
 		$name = $row['first_name'] . " " . $row['surname'];
 	}
-} else {
+} else if(isset($_GET["code"]) && !isset($_GET["user"])) {
+	//if code is set and user id is not then amend url to include user id
+	header("location: http://".$_SERVER['HTTP_HOST']."/project/views/profile.php?user=" . $_SESSION['login_user'] . "&code=" . $_GET["code"]);
+} else if(!isset($_GET["code"]) && !isset($_GET["user"])) {
+	//if neither the google code or user id are present in the url then add the user id
 	header("location: http://".$_SERVER['HTTP_HOST']."/project/views/profile.php?user=" . $_SESSION['login_user']);
 }
 
 ?>
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -62,8 +67,9 @@ if(isset($_GET["user"])) {
 	<div class="wrapper">
 		<h2 id="profile_header"><?php echo $name ?>'s Profile</h2>
 		<?php 
-			if($_SESSION['login_user'] === $user_profile) {
-				include($_SERVER['DOCUMENT_ROOT'].'/project/controller/google_cal_connect.php'); 
+			//user has to be accessing their own profile and not already have google calendar set up to see button
+			if($_SESSION['login_user'] === $user_profile && $num_rows === 0) {
+				echo $google_button;
 			}
 		?>
 		<?php if(strpos($user_profile, "b00") !== false) { ?>
