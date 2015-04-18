@@ -1195,6 +1195,11 @@ body.login {
 	background: #FF4747;
 }
 
+/* Home button confirmation page */
+#home-button {
+	float: left;
+}
+
 @media (max-width: 979px) {
 	#login_form {
 		width: 50%;

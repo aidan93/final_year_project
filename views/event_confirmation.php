@@ -5,7 +5,10 @@ $access = 'allow';
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/project/controller/session.php');
 
+//Get relevant details from url to display correct information on confirmation page
 if(isset($_GET['status'])) {
+
+	//Status is used to check what event has taken place
 	$status = $_GET['status'];
 	
 	if(isset($_GET['staff'])) {
@@ -14,10 +17,30 @@ if(isset($_GET['status'])) {
 
 	if(isset($_GET['student'])) {
 		$student = $_GET['student'];
+		$sql = "SELECT first_name, surname FROM student WHERE student_id = '$student'";
+		$query = mysqli_query($connect, $sql);
+
+		if(mysqli_num_rows($query) > 0) {
+			$row = mysqli_fetch_assoc($query);
+			$student = $row['first_name'] . " " . $row['surname'];
+		}
 	}
 
-	if(isset($_GET['mins'])) {
-		$delay_mins = $_GET['delay'];
+	if(isset($_GET['date'])) {
+		$date = date('r', strtotime($_GET['date']));
+		$date = date('d/m/Y', strtotime($date));
+	}
+
+	if(isset($_GET['start'])) {
+		$start = date('H:i', strtotime($_GET['start']));
+	}
+
+	if(isset($_GET['end'])) {
+		$end = date('H:i', strtotime($_GET['end']));
+	}
+
+	if(isset($_GET['delay'])) {
+		$delay_mins = $_GET['delay'] . " minutes";
 	}
 }
 
@@ -49,14 +72,16 @@ if(isset($_GET['status'])) {
 			<h2 class="confirm_title">Event Confirmation</h2>
 			<?php if(strpos($status, "Created") !== false) { ?>
 				<!-- Add in created html -->
-				<p>Event scheduled with <?php echo $staff; ?></p>
+				<p>Event scheduled with <?php echo $staff; ?> on <?php echo $date; ?> from <?php echo $start ?> to <?php echo $end ?>.</p>
 			<?php } else if(strpos($status, "Cancelled") !== false) { ?>
 				<!-- Add in cancelled html -->
-				<p>Event Cancelled.</p>
+				<p>Event cancelled on <?php echo $date; ?> from <?php echo $start ?> to <?php echo $end ?>.</p>
 			<?php } else if (strpos($status, "Delayed") !== false) { ?>
 				<!-- Add in delayed html -->
-				<p>Event delayed by <?php echo $delay_mins; ?> with <?php echo $student; ?></p>
+				<p>Event delayed by <?php echo $delay_mins; ?> with <?php echo $student; ?> on <?php echo $date; ?> at <?php echo $start ?></p>
 			<?php } ?>
+
+			<a href="/project/views/profile.php?user='<?php echo $_SESSION['login_user']; ?>'" id="home-button" class="button">Home</a>
 		</div>
 	</div>
 </body>

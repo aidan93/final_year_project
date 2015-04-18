@@ -246,7 +246,7 @@ if($selected_start_init && $selected_end_init) {
 			}
 		}
 
-		echo "/project/views/event_confirmation.php?status=Delayed&date=" . $date . "&start=" . $start_time . "&delay=" . $delay;
+		echo "/project/views/event_confirmation.php?status=Delayed&date=" . $date . "&start=" . $start_time . "&delay=" . $delay . "&student=" . $student;
 	}
 }
 

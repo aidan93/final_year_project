@@ -28,13 +28,18 @@ if(isset($_GET["user"])) {
 		}
 
 		$query = mysqli_query($connect, $sql) or die (mysqli_error($connect));
+		
 		// Run a quick check to verify there are any results
 		$quick_check = mysqli_num_rows($query);
 
+		//If there is a result available, get the user's name and, if available, their availability
 		if($quick_check !== 0) {
 			$row = mysqli_fetch_assoc($query);
 			$name = $row['first_name'] . " " . $row['surname'];
-			$avail = $row['availability'];
+			
+			if(isset($row['availability'])) {
+				$avail = $row['availability'];
+			}
 		} else {
 			//if user does not exist send them back to their home page
 			header("location: http://".$_SERVER['HTTP_HOST']."/project/views/profile.php?user=" . $_SESSION['login_user']);

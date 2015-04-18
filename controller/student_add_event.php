@@ -204,7 +204,7 @@ if(strpos($user_check, "b00") !== false) {
 	}
 
 	//set status to creating event
-	header('Location: http://'.$_SERVER['HTTP_HOST'].'/project/views/event_confirmation.php?status=Created&staff=' . $_POST['staff']);
+	header('Location: http://'.$_SERVER['HTTP_HOST'].'/project/views/event_confirmation.php?status=Created&staff=' . $_POST['staff'] . "&start=" . $_POST['start-time'] . "&end=" . $_POST['end-time'] . "&date=" . $date);
 }
 
 ?>
