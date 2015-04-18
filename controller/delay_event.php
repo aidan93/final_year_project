@@ -1,9 +1,9 @@
-<?php 
+<?php
 
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+//allow access to regular users
+$access = 'allow';
 
-include($_SERVER['DOCUMENT_ROOT'].'/project/controller/session.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/project/controller/session.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/project/Google/autoload.php');
 
 $user = mysqli_real_escape_string($connect, $_POST['user']);
@@ -179,73 +179,74 @@ if($selected_start_init && $selected_end_init) {
 				} catch (Google_Service_Exception $e) {
 					echo "An error has occurred with a Google Calendar request. Please return to the homepage. <br><br> <a href='/project/index.php'>Return Home</a>";
 				}
+			}
+		}
 
-				if(isset($updatedEvent)) {
-					//Get student ID from event if it exists
-					$sql = "SELECT student_id FROM events WHERE cal_event_id = '$gcal_id'";
-					$student_check = mysqli_query($connect, $sql) or die (mysqli_error($connect));
-					if(mysqli_num_rows($student_check) !== 0) {
-						$row = mysqli_fetch_assoc($student_check);
+		//Get student ID from event if it exists
+		$sql = "SELECT student_id FROM events WHERE staff_id = '$user' AND event_date = '$date' AND start_time = '$new_start' AND end_time = '$end_time'";
+		$student_check = mysqli_query($connect, $sql) or die (mysqli_error($connect));
 
-						//Delay event within student's google calendar
-						if(isset($row['student_id'])) {
+		if(mysqli_num_rows($student_check) !== 0) {
+			$row = mysqli_fetch_assoc($student_check);
 
-							$student = $row['student_id'];
-							$sql = "SELECT * FROM oauth_token WHERE student_id = '$student'";
-				
-							$query = mysqli_query($connect, $sql) or die (mysqli_error($connect));
+			//Delay event within student's google calendar
+			if(isset($row['student_id'])) {
 
-							// Run a quick check to verify if this user has their gcal linked
-							$quick_check = mysqli_num_rows($query);
+				$student = $row['student_id'];
+				$sql = "SELECT * FROM oauth_token WHERE student_id = '$student'";
+	
+				$query = mysqli_query($connect, $sql) or die (mysqli_error($connect));
 
-							if($quick_check !== 0) {
+				// Run a quick check to verify if this user has their gcal linked
+				$quick_check = mysqli_num_rows($query);
 
-								$row = mysqli_fetch_assoc($query);
-								$token_access = $row['access_token'];
-								$token_type = $row['token_type'];
-								$token_expire = $row['expires_in'];
-								$token_refresh = $row['refresh_token'];
-								$token_created = $row['created'];
-								$token_user = $row['student_id'];
-								
-								$array = array('access_token'=>$token_access, 'token_type'=>$token_type, 'expires_in'=>$token_expire, 'refresh_token'=>$token_refresh, 'created'=>$token_created);
+				if($quick_check !== 0) {
 
-								if($client->isAccessTokenExpired()) {
-									$client->refreshToken($token_refresh);
-							        $newtoken = $client->getAccessToken();
-							        $token = json_decode($newtoken ,true);
-									$token_access = $token['access_token'];
-							        $tokenupdate = "UPDATE oauth_token SET access_token = '$token_access' WHERE refresh_token = '$token_refresh' AND student_id = '$token_user'";
-							        mysqli_query($connect, $tokenupdate) or die (mysqli_error($connect));
+					$row = mysqli_fetch_assoc($query);
+					$token_access = $row['access_token'];
+					$token_type = $row['token_type'];
+					$token_expire = $row['expires_in'];
+					$token_refresh = $row['refresh_token'];
+					$token_created = $row['created'];
+					$token_user = $student;
+					
+					$array = array('access_token'=>$token_access, 'token_type'=>$token_type, 'expires_in'=>$token_expire, 'refresh_token'=>$token_refresh, 'created'=>$token_created);
 
-							        $replacement = array('access_token'=>$token_access);
-							        $array = array_replace($array, $replacement);
-								}
+					if($client->isAccessTokenExpired()) {
+						$client->refreshToken($token_refresh);
+				        $newtoken = $client->getAccessToken();
+				        $token = json_decode($newtoken ,true);
+						$token_access = $token['access_token'];
+				        $tokenupdate = "UPDATE oauth_token SET access_token = '$token_access' WHERE refresh_token = '$token_refresh' AND student_id = '$token_user'";
+				        mysqli_query($connect, $tokenupdate) or die (mysqli_error($connect));
 
-								$token = json_encode($array);
-								$client->setAccessToken($token);
+				        $replacement = array('access_token'=>$token_access);
+				        $array = array_replace($array, $replacement);
+					}
 
-								$service = new Google_Service_Calendar($client);
+					$token = json_encode($array);
+					$client->setAccessToken($token);
 
-								$event = $service->events->get('primary', $gcal_id);
-								$start = new Google_Service_Calendar_EventDateTime();
-								$start->setTimeZone('Europe/London');
-								$start->setDateTime($gcal_start_time);
-								$event->setStart($start);
+					$service = new Google_Service_Calendar($client);
 
-								try {
-									$updatedEvent = $service->events->update('primary', $event->getId(), $event);
-								} catch (Google_Service_Exception $e) {
-									echo "An error has occurred with a Google Calendar request. Please return to the homepage. <br><br> <a href='/project/index.php'>Return Home</a>";
-								}
-							}
-						}
+					$gcal_start_time = $date . 'T' . $new_start;
+
+					$event = $service->events->get('primary', $gcal_id);
+					$start = new Google_Service_Calendar_EventDateTime();
+					$start->setTimeZone('Europe/London');
+					$start->setDateTime($gcal_start_time);
+					$event->setStart($start);
+
+					try {
+						$updatedEvent = $service->events->update('primary', $event->getId(), $event);
+					} catch (Google_Service_Exception $e) {
+						echo "An error has occurred with a Google Calendar request. Please return to the homepage. <br><br> <a href='/project/index.php'>Return Home</a>";
 					}
 				}
 			}
-
-			echo "/project/views/event_confirmation.php?status=Delayed&date=" . $date . "&start=" . $start_time . "&delay=" . $delay;
 		}
+
+		echo "/project/views/event_confirmation.php?status=Delayed&date=" . $date . "&start=" . $start_time . "&delay=" . $delay;
 	}
 }
 

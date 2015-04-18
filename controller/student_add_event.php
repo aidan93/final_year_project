@@ -1,5 +1,9 @@
 <?php
-include($_SERVER['DOCUMENT_ROOT'].'/project/controller/session.php');
+
+//allow access to regular users
+$access = 'allow';
+
+require_once($_SERVER['DOCUMENT_ROOT'].'/project/controller/session.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/project/Google/autoload.php');
 
 //Only students have access to this file
@@ -201,8 +205,6 @@ if(strpos($user_check, "b00") !== false) {
 
 	//set status to creating event
 	header('Location: http://'.$_SERVER['HTTP_HOST'].'/project/views/event_confirmation.php?status=Created&staff=' . $_POST['staff']);
-
-	mysqli_close($connect);
 }
 
 ?>

@@ -1,9 +1,9 @@
 <?php
 
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+//allow access to regular users
+$access = 'allow';
 
-include($_SERVER['DOCUMENT_ROOT'].'/project/controller/session.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/project/controller/session.php');
 
 if(isset($_GET['status'])) {
 	$status = $_GET['status'];

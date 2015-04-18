@@ -1,7 +1,4 @@
-<?php    
-
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+<?php 
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/project/Google/autoload.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/project/controller/connect.php');

@@ -1,9 +1,9 @@
 <?php
 
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+//allow access to regular users
+$access = 'allow';
 
-include($_SERVER['DOCUMENT_ROOT'].'/project/controller/session.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/project/controller/session.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/project/Google/autoload.php');
 
 //Get the user's id and selected times for event
@@ -175,7 +175,5 @@ if($staff && $date && $start_init && $end_init) {
 } else {
 	echo "Missing some data.";
 }
-
-mysqli_close($connect);
 
 ?>

@@ -1,6 +1,6 @@
 <?php 
 
-include($_SERVER['DOCUMENT_ROOT'].'/project/controller/connect.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/project/controller/connect.php');
 
 // Start session
 session_start();
@@ -21,7 +21,7 @@ $row = mysqli_fetch_assoc($query);
 $login_session = $row['first_name'] . ' ' . $row['surname'];
 
 
-if(!isset($user_check)) {
+if(!isset($user_check) || ($user_check !== 'e00000' && $access === 'restricted')) {
 	mysqli_close($conn);
 	header("location: http://".$_SERVER['HTTP_HOST']."/project/index.php");
 	exit;

@@ -1,6 +1,9 @@
 <?php 
 
-include($_SERVER['DOCUMENT_ROOT'].'/project/controller/session.php');
+//allow access to regular users
+$access = 'allow';
+
+require_once($_SERVER['DOCUMENT_ROOT'].'/project/controller/session.php');
 
 ?>
 <!DOCTYPE html>

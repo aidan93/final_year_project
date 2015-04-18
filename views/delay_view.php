@@ -1,6 +1,9 @@
 <?php 
 
-include($_SERVER['DOCUMENT_ROOT'].'/project/controller/session.php');
+//allow access to regular users
+$access = 'allow';
+
+require_once($_SERVER['DOCUMENT_ROOT'].'/project/controller/session.php');
 
 ?>
 <!DOCTYPE html>
@@ -31,7 +34,7 @@ include($_SERVER['DOCUMENT_ROOT'].'/project/controller/session.php');
 		<?php } ?>
 	</div>
 	<div class="wrapper">
-		<?php include($_SERVER['DOCUMENT_ROOT'].'/project/controller/todays_events.php'); ?>
+		<?php require_once($_SERVER['DOCUMENT_ROOT'].'/project/controller/todays_events.php'); ?>
 	</div>
 </body>
 </html>

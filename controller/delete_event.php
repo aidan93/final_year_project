@@ -1,6 +1,9 @@
 <?php 
 
-include($_SERVER['DOCUMENT_ROOT'].'/project/controller/session.php');
+//allow access to regular users
+$access = 'allow';
+
+require_once($_SERVER['DOCUMENT_ROOT'].'/project/controller/session.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/project/Google/autoload.php');
 
 $user = mysqli_real_escape_string($connect, $_POST['user']);

@@ -1,6 +1,6 @@
 <?php
 
-include($_SERVER['DOCUMENT_ROOT'].'/project/controller/login.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/project/controller/login.php');
 
 ?>
 

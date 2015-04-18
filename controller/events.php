@@ -1,5 +1,5 @@
 <?php 
-include($_SERVER['DOCUMENT_ROOT'].'/project/controller/connect.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/project/controller/connect.php');
 
 //get date and user ID of profile owner
 $date = $_GET["date"];
@@ -64,6 +64,4 @@ foreach($startTimes as $key => $value)
 		echo "<div class='timeslot' data-user-profile=".$user_profile." data-date=".$date."><span class='start_time'>".$value."</span><span class='dash'> - </span><span class='end_time'>".$endTimes[$key]."</span><button type='button' class='delete_event'>Delete</button><button type='button' class='delay_event'>Delay</button>" . $selectbox . "<button type='button' class='view_event'>View</button></div>";
 	}
 }
-
-mysqli_close($connect);
 ?>

@@ -65,7 +65,5 @@ if(isset($user_profile)) {
 	}
 
 	echo $events;
-
-	mysqli_close($connect);
 }
 ?>

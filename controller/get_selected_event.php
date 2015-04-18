@@ -1,6 +1,9 @@
 <?php
 
-include($_SERVER['DOCUMENT_ROOT'].'/project/controller/session.php');
+//allow access to regular users
+$access = 'allow';
+
+require_once($_SERVER['DOCUMENT_ROOT'].'/project/controller/session.php');
 
 //Get the user's id and selected times for event
 $user_profile = mysqli_real_escape_string($connect, $_POST['user']);
@@ -87,9 +90,7 @@ if($selected_start_init && $selected_end_init) {
 	} else {
 
 		echo("Error: " . mysqli_error($connect));
-	}
-
-	mysqli_close($connect);
+	}	
 }
 
 ?>

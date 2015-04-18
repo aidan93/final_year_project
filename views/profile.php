@@ -1,8 +1,11 @@
 <?php
 
-include($_SERVER['DOCUMENT_ROOT'].'/project/controller/session.php');
-include($_SERVER['DOCUMENT_ROOT'].'/project/controller/calendar_setup.php');
-include($_SERVER['DOCUMENT_ROOT'].'/project/controller/google_cal_connect.php');
+//allow access to regular users
+$access = 'allow';
+
+require_once($_SERVER['DOCUMENT_ROOT'].'/project/controller/session.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/project/controller/calendar_setup.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/project/controller/google_cal_connect.php');
 
 //Get the user ID of profile
 if(isset($_GET["user"])) {
@@ -46,8 +49,8 @@ if(isset($_GET["user"])) {
 
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/jquery-ui.min.js"></script>
-	<!-- <script type="text/javascript" src="/project/js/search.js"></script> -->
 	<script type="text/javascript" src="/project/js/create_event.js"></script>
+	<script type="text/javascript" src="/project/js/post.js"></script>
 </head>
 <body>
 	<div class="overlay"></div>
@@ -99,9 +102,35 @@ if(isset($_GET["user"])) {
 					<th>SAT</th>
 					<th>SUN</th>
 				</tr>
-				<?php include($_SERVER['DOCUMENT_ROOT'].'/project/controller/printCal.php'); ?>
+				<?php require_once($_SERVER['DOCUMENT_ROOT'].'/project/controller/printCal.php'); ?>
 			</table>
 		</div>
+		<!-- Display noticeboard on staff member's profile -->
+		<?php if(strpos($user_profile, "b00") === false) { ?>
+			<div id="noticeboard">
+				<h3 class="nb_header">Noticeboard</h3>
+				<div id="posts_wrapper">
+					<?php require_once($_SERVER['DOCUMENT_ROOT'].'/project/controller/printPosts.php'); ?>
+				</div>
+				<?php if($_SESSION['login_user'] === $user_profile) { ?>
+					<form action="/project/controller/staff_add_post.php" method="post">
+						<input type="hidden" name="user" value="<?php echo $user_profile ?>">
+						<textarea name="post" cols="40" rows="3" placeholder="Create New Post..."></textarea>
+						<input type="submit" value="Post">
+					</form>
+				<?php } ?>
+			</div>
+
+			<div id="post_popup">
+				<a href="#" class="close-popup"><img src="/project/images/close-icon.png" /></a>
+				<?php if($_SESSION['login_user'] === $user_profile) { ?>
+					<button type="button" id="edit_post">Edit Post</button>
+					<button type="button" id="delete_post">Delete Post</button>
+				<?php } else { ?>
+					<button type="button" id="view_post">View Post</button>
+				<?php } ?>
+			</div>
+		<?php } ?>
 	</div>
 
 	<?php if(strpos($_SESSION['login_user'], "b00") === false && $_SESSION['login_user'] === $user_profile) { ?>
@@ -120,6 +149,13 @@ if(isset($_GET["user"])) {
 			<li class='form_row'><label for='description' class='form_title'>Description:</label><textarea name='description' cols='40' rows='6'></textarea></li>
 			
 			<input type='submit'></form>
+		</div>
+
+		<!-- Popup box that appears to edit post -->
+		<div id="edit_popup">
+			<h3 id="popup-header">Edit Post</h3>
+			<a href="#" class="close-popup"><img src="/project/images/close-icon.png" /></a>
+
 		</div>
 	<?php } ?>
 </body>

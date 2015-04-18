@@ -1,5 +1,9 @@
 <?php
-include($_SERVER['DOCUMENT_ROOT'].'/project/controller/session.php');
+
+//allow access to regular users
+$access = 'allow';
+
+require_once($_SERVER['DOCUMENT_ROOT'].'/project/controller/session.php');
 
 $user_profile = $_GET['user'];
 ?>
@@ -30,7 +34,7 @@ $user_profile = $_GET['user'];
 				<span id="header_endtime">END TIME</span>
 				<span id="header_time">TIME</span>
 			</div>
-			<div id="event_times"><?php include($_SERVER['DOCUMENT_ROOT'].'/project/controller/events.php'); ?></div>
+			<div id="event_times"><?php require_once($_SERVER['DOCUMENT_ROOT'].'/project/controller/events.php'); ?></div>
 			<?php if(strpos($_SESSION['login_user'], "b00") !== false && $_SESSION['login_user'] !== $user_profile) { ?>
 				<div id="buttons">
 					<button type="button" id="cancel">Cancel</button>

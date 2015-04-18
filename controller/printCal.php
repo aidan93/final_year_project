@@ -1,5 +1,5 @@
 <?php
-	include($_SERVER['DOCUMENT_ROOT'].'/project/controller/connect.php');
+	require_once($_SERVER['DOCUMENT_ROOT'].'/project/controller/connect.php');
 
 	//set up calendar according to current date
 	$timestamp = mktime(0,0,0,$cMonth,1,$cYear);
@@ -113,6 +113,5 @@
 	}
 
 	echo "</tr>";
-
-	mysqli_close($connect);
+	
 ?>
