@@ -16,6 +16,8 @@ if(mysqli_num_rows($query) > 0) {
 	}
 
 	echo $posts;
+} else {
+	echo "<h4>No posts to display at this time.</h4>";
 }
 
 ?>

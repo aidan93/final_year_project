@@ -1,6 +1,12 @@
 $(document).ready(function() {
 	//hide popup div on page load
-	$("#post_popup, #edit_popup").hide();
+	$("#post_popup, #edit_popup, #view_popup").hide();
+
+	//ellipsis for overflow text
+	$(".post-text").dotdotdot({
+		wrap: 'letter',
+		height: 38
+	});
 
 	//open post popup when dropdown icon clicked
 	$(".post .post-icon").click(function(event) {
@@ -22,6 +28,7 @@ $(document).ready(function() {
 			type: 'POST',
 			url: '/project/controller/staff_get_post.php',
 			data: {
+				action: 'edit',
 				post: $("#post_popup").attr("data-post-id"),
 			},
 			success: function(data){
@@ -30,6 +37,28 @@ $(document).ready(function() {
 				$("#edit_popup").append(data);
 				$(".overlay").fadeIn();
 				$("#edit_popup").fadeIn();
+			},
+			error: function(xhr, status, error){
+				console.log(error);
+			}
+		});
+	});
+
+	//when view button is clicked get post data and add to popup
+	$("#view_post").click(function(event) {
+		$.ajax({
+			type: 'POST',
+			url: '/project/controller/staff_get_post.php',
+			data: {
+				action: 'view',
+				post: $("#post_popup").attr("data-post-id"),
+			},
+			success: function(data){
+				$("#post_popup").fadeOut();
+				$("#view_popup #view_post").remove();
+				$("#view_popup").append(data);
+				$(".overlay").fadeIn();
+				$("#view_popup").fadeIn();
 			},
 			error: function(xhr, status, error){
 				console.log(error);
@@ -93,7 +122,7 @@ $(document).ready(function() {
 
 	//function to close the current popup
 	function closePopup() {
-		$("#post_popup, #edit_popup").fadeOut();
+		$("#post_popup, #edit_popup, #view_popup").fadeOut();
 	}
 
 	//function to get parameter from URL

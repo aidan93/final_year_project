@@ -17,7 +17,7 @@ $(document).ready(function() {
 
 	//redirects back to the calendar
 	$("#cancel, #back").click(function(){
-		parent.history.back();
+		history.back();
 		return false;
 	});
 

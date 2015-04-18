@@ -66,7 +66,13 @@
 			*/
 			if(($i % 7 ==6) || ($i % 7 ==5)) {
 
-				echo "<td class='weekend' data-date=".$date."><span class='date'>". $day ."</span><span class='weekday'>".$weekday."</span></td>";
+				//check if day has passed or not
+				if($date >= $today) {
+					echo "<td class='weekend'><span class='date'>". $day ."</span><span class='weekday'>".$weekday."</span></td>";
+				} else {
+					echo "<td class='past'><span class='date'>". $day ."</span><span class='weekday'>".$weekday."</span></td>";
+				}				
+
 			} else {
 
 				if($quick_check != 0 && $date >= $today) {
@@ -94,8 +100,13 @@
 					}
 					
 				} else {
-					
-					echo "<td class='unavailable'><span class='date'>". $day ."</span><span class='weekday'>".$weekday."</span></td>";
+
+					//check if day has passed or not
+					if($date >= $today) {
+						echo "<td class='unavailable'><span class='date'>". $day ."</span><span class='weekday'>".$weekday."</span></td>";
+					} else {
+						echo "<td class='past'><span class='date'>". $day ."</span><span class='weekday'>".$weekday."</span></td>";
+					}
 				}
 			}
 			if(($i % 7) == 6 ) { 

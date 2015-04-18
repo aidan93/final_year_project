@@ -11,19 +11,34 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/project/controller/google_cal_connect.p
 if(isset($_GET["user"])) {
 	$user_profile = $_GET["user"];
 
-	if(strpos($user_profile, "b00") !== false) {
-		$sql = "SELECT first_name, surname FROM student WHERE student_id = '$user_profile'";
+	if(strpos($user_profile, "b00") !== false && strpos($_SESSION['login_user'], "b00") === false) {
+		//if staff try to access student page send them back to their home page
+		header("location: http://".$_SERVER['HTTP_HOST']."/project/views/profile.php?user=" . $_SESSION['login_user']);
+	} else if(strpos($user_profile, "b00") !== false && strpos($_SESSION['login_user'], "b00") !== false && $_SESSION['login_user'] !== $user_profile) {
+		//if student tries to access another student page send them back to their home page
+		header("location: http://".$_SERVER['HTTP_HOST']."/project/views/profile.php?user=" . $_SESSION['login_user']);
+	} else if(strpos($user_profile, "b00") === false && strpos($_SESSION['login_user'], "b00") === false && $_SESSION['login_user'] !== $user_profile) {
+		//if staff member tries to access another staff member's page send them back to their home page
+		header("location: http://".$_SERVER['HTTP_HOST']."/project/views/profile.php?user=" . $_SESSION['login_user']);
 	} else {
-		$sql = "SELECT first_name, surname FROM staff WHERE staff_id = '$user_profile'";
-	}
+		if(strpos($user_profile, "b00") !== false) {
+			$sql = "SELECT first_name, surname FROM student WHERE student_id = '$user_profile'";
+		} else {
+			$sql = "SELECT first_name, surname, availability FROM staff WHERE staff_id = '$user_profile'";
+		}
 
-	$query = mysqli_query($connect, $sql) or die (mysqli_error($connect));
-	// Run a quick check to verify there are any results
-	$quick_check = mysqli_num_rows($query);
+		$query = mysqli_query($connect, $sql) or die (mysqli_error($connect));
+		// Run a quick check to verify there are any results
+		$quick_check = mysqli_num_rows($query);
 
-	if($quick_check !== 0) {
-		$row = mysqli_fetch_assoc($query);
-		$name = $row['first_name'] . " " . $row['surname'];
+		if($quick_check !== 0) {
+			$row = mysqli_fetch_assoc($query);
+			$name = $row['first_name'] . " " . $row['surname'];
+			$avail = $row['availability'];
+		} else {
+			//if user does not exist send them back to their home page
+			header("location: http://".$_SERVER['HTTP_HOST']."/project/views/profile.php?user=" . $_SESSION['login_user']);
+		}
 	}
 } else if(isset($_GET["code"]) && !isset($_GET["user"])) {
 	//if code is set and user id is not then amend url to include user id
@@ -49,8 +64,15 @@ if(isset($_GET["user"])) {
 
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="/project/js/jquery.dotdotdot.min.js"></script>
 	<script type="text/javascript" src="/project/js/create_event.js"></script>
 	<script type="text/javascript" src="/project/js/post.js"></script>
+	<script type="text/javascript" src="/project/js/legend.js"></script>
+
+	<!-- Only available for staff viewing their own profile -->
+	<?php if($_SESSION['login_user'] === $user_profile && strpos($_SESSION['login_user'], "b00") === false) { ?>
+		<script type="text/javascript" src="/project/js/availability.js"></script>
+	<?php } ?>
 </head>
 <body>
 	<div class="overlay"></div>
@@ -69,17 +91,34 @@ if(isset($_GET["user"])) {
 	</div>
 	<div class="wrapper">
 		<h2 id="profile_header"><?php echo $name ?>'s Profile</h2>
+		<?php if(strpos($user_profile, "b00") === false) { ?>
+			<div id="availability">
+				<?php if($_SESSION['login_user'] === $user_profile && strpos($_SESSION['login_user'], "b00") === false) { 
+						if($avail === '0') { ?>
+							<a href="#"><span class='busy'>Busy</span></a>
+						<?php } else { ?>
+							<a href="#"><span class='available'>Available</span></a>
+						<?php } ?>
+				<?php } else {
+						if($avail === '0') { ?>
+							<span class='busy'>Busy</span>
+						<?php } else { ?>
+							<span class='available'>Available</span>
+						<?php } ?>
+				<?php } ?>
+			</div>
+		<?php } ?>
+		<?php if(strpos($user_profile, "b00") !== false) { ?>
+			<div class="table_wrapper student_cal">
+		<?php } else { ?>
+			<div class="table_wrapper staff_cal">
+		<?php } ?>
 		<?php 
 			//user has to be accessing their own profile and not already have google calendar set up to see button
 			if($_SESSION['login_user'] === $user_profile && $num_rows === 0) {
 				echo $google_button;
 			}
 		?>
-		<?php if(strpos($user_profile, "b00") !== false) { ?>
-			<div class="table_wrapper student_cal">
-		<?php } else { ?>
-			<div class="table_wrapper staff_cal">
-		<?php } ?>
 		<!-- Staff controls to add/edit events -->
 		<?php if(strpos($_SESSION['login_user'], "b00") === false && $_SESSION['login_user'] === $user_profile) { ?>
 			<div id="staff_controls">
@@ -87,6 +126,7 @@ if(isset($_GET["user"])) {
 				<a href="/project/views/delay_view.php?user=<?php echo $user_profile; ?>" id="delay_button" class="button">Delay Event</a>
 			</div>
 		<?php } ?>
+			<button type="button" id="cal_legend">Legend</button>
 			<table class="clmonth">
 				<caption>
 					<a href="<?php echo $_SERVER["PHP_SELF"] . "?user=" . $user_profile . "&month=". $prev_month . "&year=" . $prev_year; ?>" class="previous_link"></a>
@@ -140,9 +180,9 @@ if(isset($_GET["user"])) {
 			<a href="#" class="close-popup"><img src="/project/images/close-icon.png" /></a>
 
 			<form action='/project/controller/staff_add_event.php' method='post'>
-			<li class='form_row hidden'><label for='staff' class='form_title'>Staff Member:</label><input type='hidden' name='staff' value="<?php echo $_SESSION['login_user'] ?>"></li>
+			<li class='form_row hidden'><label for='staff' class='form_title'>Staff Member:</label><input type='hidden' name='staff' value="<?php echo $_SESSION['login_user']; ?>"></li>
 			<li class='form_row'><label for='title' class='form_title'>Event Title:</label><input type='text' name='title'></li>
-			<li class='form_row'><label for='date' class='form_title'>Event Date:</label><input type='text' name='date' id='datepicker' required></li>
+			<li class='form_row'><label for='date' class='form_title'>Event Date:</label><input type='text' name='date' id='datepicker' min="<?php echo date('Y-m-d'); ?>" required></li>
 			<li class='form_row'><label for='start-time' class='form_title'>Event Start Time:</label><input type='time' name='start-time' id='start-time' required></li>
 			<li class='form_row'><label for='end-time' class='form_title'>Event End Time:</label><input type='time' name='end-time' id='end-time' step='1800' required></li>
 			<li class='form_row'><label for='location' class='form_title'>Location: </label><input type='text' name='location'></li>
@@ -155,8 +195,24 @@ if(isset($_GET["user"])) {
 		<div id="edit_popup">
 			<h3 id="popup-header">Edit Post</h3>
 			<a href="#" class="close-popup"><img src="/project/images/close-icon.png" /></a>
-
 		</div>
 	<?php } ?>
+
+	<!-- Popup box that appears to view post -->
+	<div id="legend_popup">
+		<a href="#" class="close-popup"><img src="/project/images/close-icon.png" /></a>
+		<div id="legend_wrapper">
+			<div id="past" class='legend_des'><span class='color'></span><span class='info'>Past</div>
+			<div id="weekend" class='legend_des'><span class='color'></span><span class='info'>Weekend</div>
+			<div id="active" class='legend_des'><span class='color'></span><span class='info'>Available</div>
+			<div id="no-events" class='legend_des'><span class='color'></span><span class='info'>Not Available</div>
+		</div>
+	</div>
+
+	<!-- Popup box that appears to view post -->
+	<div id="view_popup">
+		<h3 id="popup-header">View Post</h3>
+		<a href="#" class="close-popup"><img src="/project/images/close-icon.png" /></a>
+	</div>
 </body>
 </html>

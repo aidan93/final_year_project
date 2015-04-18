@@ -69,5 +69,6 @@ $(document).ready(function() {
 	function closePopup() {
 		$(".overlay").fadeOut();
 		$("#popup").fadeOut();
+		$("#ui-datepicker-div").fadeOut();
 	}
 });
