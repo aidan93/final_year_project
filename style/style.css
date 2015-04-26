@@ -69,6 +69,7 @@ textarea {
 	border-spacing: 0;
 	width: 100%;
 	white-space: nowrap;
+	clear: both;
 }
 
 .clmonth caption {
@@ -1202,6 +1203,7 @@ body.login {
 }
 
 @media (max-width: 979px) {
+
 	#login_form {
 		width: 50%;
 	}
@@ -1228,6 +1230,8 @@ body.login {
 	#view_popup {
 		width: 70%;
 		left: 15%;
+		overflow: scroll;
+		height: 100%;
 	}
 }
 
