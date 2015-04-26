@@ -32,7 +32,7 @@ $(document).ready(function() {
 	});
 
 	/* when user is clicked, load their data
-	** element is dynamically created so need to alter click function
+	** element is dynamically created so click function is different to those above
 	*/
 	$('body').on('click', '.search_result a.result', function() {
 	    if($(this).parent().hasClass('selected')) {
@@ -116,6 +116,10 @@ $(document).ready(function() {
 			}
 		} else if(error == 'delete') {
 			if(confirm('Error deleting record from database')) {
+				location.href=location.href.replace(/&?error=([^&]$|[^&]*)/i, "");
+			}
+		} else if(error == 'password') {
+			if(confirm('Invalid password. Password must contain at least: 1 uppercase letter, 1 lowercase letter, 1 number and at least 8 characters long.')) {
 				location.href=location.href.replace(/&?error=([^&]$|[^&]*)/i, "");
 			}
 		}

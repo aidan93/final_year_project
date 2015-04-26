@@ -16,9 +16,13 @@ if(strpos($user_check, "b00") !== false) {
 	$student = mysqli_real_escape_string($connect, $user_check);
 }
 
+if("" !== trim($_POST['status'])) {
+	$status = mysqli_real_escape_string($connect, $_POST['status']);
+}
+
 if($selected_start_init && $selected_end_init) {
 
-	//format time to insert to mysql database
+	//format time to query mysql database
 	$selected_start = strtotime($selected_start_init);
 	$selected_end = strtotime($selected_end_init);
 	$selected_start = date('H:i:s', $selected_start);
@@ -33,14 +37,23 @@ if($selected_start_init && $selected_end_init) {
 
 	if(mysqli_num_rows($query) > 0) {
 
-		while ($result = mysqli_fetch_assoc($query)) {
+		if($result = mysqli_fetch_assoc($query)) {
 
-			//if student id is available then get student_id, title and description
+			//if student id is available then get student_id
 			if(isset($result['student_id'])) {
 				$student = $result['student_id'];
+			}
+
+			//if title is available then get title
+			if(isset($result['event_title'])) {
 				$title = $result['event_title'];
+			}
+
+			//if description is available then get description
+			if(isset($result['description'])) {
 				$des = $result['description'];
 			}
+
 			$staff = $result['staff_id'];
 			$location = $result['location'];
 		}
@@ -48,14 +61,14 @@ if($selected_start_init && $selected_end_init) {
 		//Get staff members full name
 		$sql_staff = "SELECT first_name, surname FROM staff WHERE staff_id = '$staff'";
 		$query_staff = mysqli_query($connect, $sql_staff);
-		while($result_staff = mysqli_fetch_assoc($query_staff)) {
+		if($result_staff = mysqli_fetch_assoc($query_staff)) {
 			$staff = $result_staff['first_name'] .' '. $result_staff['surname'];
 		}
 
 		//Get students full name
 		$sql_student = "SELECT first_name, surname FROM student WHERE student_id = '$student'";
 		$query_student = mysqli_query($connect, $sql_student);
-		while($result_student = mysqli_fetch_assoc($query_student)) {
+		if($result_student = mysqli_fetch_assoc($query_student)) {
 			$student = $result_student['first_name'] .' '. $result_student['surname'];
 		}
 
@@ -70,10 +83,16 @@ if($selected_start_init && $selected_end_init) {
 			$form .= "<li class='form_row'><label for='end-time' class='form_title'>Event End Time:</label><input type='text' name='end-time' value='" . $selected_end_init . "' readonly='readonly'></li>";
 			$form .= "<li class='form_row'><label for='location' class='form_title'>location: </label><input type='text' name='location' value='" . $location . "' readonly='readonly'></li>";
 			$form .= "<li class='form_row'><label for='description' class='form_title'>Description:</label><textarea name='description' cols='40' rows='6' required>" . $des . "</textarea></li>";
+
+			if(isset($status) && $status === 'edit') {
+				$form .= "<li class='form_row hidden'><input type='hidden' name='edit' value='edit'></li>";
+			}
 		} else {
 			$form = "<form action='/project/controller/staff_add_event.php' method='post'>";
 			$form .= "<li class='form_row'><label for='staff' class='form_title'>Staff Member:</label><input type='text' name='staff' value='" . $staff . "' readonly='readonly'></li>";
-			$form .= "<li class='form_row'><label for='student' class='form_title'>Student:</label><input type='text' name='student' value='" . $student . "' readonly='readonly'></li>";
+			if(isset($student)) {
+				$form .= "<li class='form_row'><label for='student' class='form_title'>Student:</label><input type='text' name='student' value='" . $student . "' readonly='readonly'></li>";
+			}
 			$form .= "<li class='form_row'><label for='title' class='form_title'>Event Title:</label><input type='text' name='title' value='" . $title . "'></li>";
 			$form .= "<li class='form_row'><label for='date' class='form_title'>Event Date:</label><input type='text' name='date' value='" . date("d/m/Y", strtotime($date)) . "' readonly='readonly'></li>";
 			$form .= "<li class='form_row'><label for='start-time' class='form_title'>Event Start Time:</label><input type='text' name='start-time' value='" . $selected_start_init . "' readonly='readonly'></li>";

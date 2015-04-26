@@ -15,17 +15,6 @@ if(isset($_GET['status'])) {
 		$staff = $_GET['staff'];
 	}
 
-	if(isset($_GET['student'])) {
-		$student = $_GET['student'];
-		$sql = "SELECT first_name, surname FROM student WHERE student_id = '$student'";
-		$query = mysqli_query($connect, $sql);
-
-		if(mysqli_num_rows($query) > 0) {
-			$row = mysqli_fetch_assoc($query);
-			$student = $row['first_name'] . " " . $row['surname'];
-		}
-	}
-
 	if(isset($_GET['date'])) {
 		$date = date('r', strtotime($_GET['date']));
 		$date = date('d/m/Y', strtotime($date));
@@ -69,16 +58,38 @@ if(isset($_GET['status'])) {
 	</div>
 	<div class="wrapper">
 		<div id="confirmation">
-			<h2 class="confirm_title">Event Confirmation</h2>
-			<?php if(strpos($status, "Created") !== false) { ?>
-				<!-- Add in created html -->
+			<?php if(strpos($status, "Free") !== false) { ?>
+				<!-- Confirm free time events have been created -->
+				<h2 class="confirm_title">Free Time Events Created</h2>
+				<p>Free time events created from <?php echo $start ?> to <?php echo $end ?> on <?php echo $date; ?>.</p>
+			<?php } else if(strpos($status, "Created") !== false) { ?>
+				<!-- Confirm event has been scheduled with staff member -->
+				<h2 class="confirm_title">Event Scheduled</h2>
 				<p>Event scheduled with <?php echo $staff; ?> on <?php echo $date; ?> from <?php echo $start ?> to <?php echo $end ?>.</p>
 			<?php } else if(strpos($status, "Cancelled") !== false) { ?>
-				<!-- Add in cancelled html -->
+				<!-- Confirm event has been cancelled -->
+				<h2 class="confirm_title">Event Cancelled</h2>
 				<p>Event cancelled on <?php echo $date; ?> from <?php echo $start ?> to <?php echo $end ?>.</p>
 			<?php } else if (strpos($status, "Delayed") !== false) { ?>
-				<!-- Add in delayed html -->
-				<p>Event delayed by <?php echo $delay_mins; ?> with <?php echo $student; ?> on <?php echo $date; ?> at <?php echo $start ?></p>
+				<!-- Confirm event has been delayed -->
+				<h2 class="confirm_title">Event Delayed</h2>
+				<p>Event delayed by <?php echo $delay_mins; ?> on <?php echo $date; ?> at <?php echo $start ?></p>
+			<?php } else if (strpos($status, "Exceeded") !== false) { ?>
+				<!-- Notify staff member that event has exceeded the delay limit -->
+				<h2 class="confirm_title">Delay Limit Exceeded</h2>
+				<p>Event scheduled for <?php echo $date; ?> at <?php echo $start ?> has exceeded the maximum 20 minute delay. Please allow at least 10 minutes for each event.</p>
+			<?php } else if (strpos($status, "Edited") !== false) { ?>
+				<!-- Confirm event has been edited -->
+				<h2 class="confirm_title">Event Edited</h2>
+				<p>Event edited on <?php echo $date; ?> at <?php echo $start ?></p>
+			<?php } else if (strpos($status, "Error") !== false) { ?>
+				<!-- Inform of event conflict -->
+				<h2 class="confirm_title">Event Conflict</h2>
+				<p>Event conflict on <?php echo $date; ?> between the times <?php echo $start ?> and <?php echo $end ?></p>
+			<?php } else if(strpos($status, "Google") !== false) { ?>
+				<!-- Inform of Google error -->
+				<h2 class="confirm_title">Google Calendar Error</h2>
+				<p>Error with Google calendar occurred. Please try again.</p>
 			<?php } ?>
 
 			<a href="/project/views/profile.php?user='<?php echo $_SESSION['login_user']; ?>'" id="home-button" class="button">Home</a>

@@ -14,7 +14,7 @@ if(isset($user_profile)) {
 	$sql = "SELECT * FROM events WHERE staff_id = '$user_profile' AND event_date = '$date'";
 	
 	//run sql query
-	$query = mysqli_query($connect, $sql) or die (mysqli_error($connect));
+	$query = mysqli_query($connect, $sql);
 	
 	if(mysqli_num_rows($query) !== 0) {
 		//create arrays for both start and end times
@@ -58,10 +58,10 @@ if(isset($user_profile)) {
 
 		$events .= "</div>";
 		$events .= "<div id='buttons'>";
-		$events .= "<button type='button' id='back'>Back</button></div></div>";
+		$events .= "<button type='button' id='back' class='delay-back'>Back</button></div></div>";
 	} else {
 		$events .= "<h3>You Have No Events Scheduled for Today.</h3>";
-		$events .= "<button type='button' id='back'>Back</button>";
+		$events .= "<button type='button' id='back' class='delay-back'>Back</button>";
 	}
 
 	echo $events;

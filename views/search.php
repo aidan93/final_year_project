@@ -13,10 +13,6 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/project/controller/session.php');
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,700,400' rel='stylesheet' type='text/css'>
 	<link href="/project/style/style.css" rel="stylesheet" type="text/css">
-	<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"></script>
-	<script type="text/javascript" src="/project/js/search.js"></script> -->
-</head>
 <body>
 	<div id="header">
 		<div id="profile">
@@ -50,10 +46,13 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/project/controller/session.php');
 					$surname = $result['surname'];
 					$room = $result['room_number'];
 
-					echo "<div class='search_result'><a href=http://" . $_SERVER['HTTP_HOST'] . "/project/views/profile.php?user=" . $user_id . "><span class='staff_name'>" . $first_name . " " . $surname . "</span><span class='room'>Room: " . $room . "</span></a></div>";
+					//Dont display admin user record
+					if(strpos($user_id, 'e00000') === false) {
+						echo "<div class='search_result'><a href=http://" . $_SERVER['HTTP_HOST'] . "/project/views/profile.php?user=" . $user_id . "><span class='staff_name'>" . $first_name . " " . $surname . "</span><span class='room'>Room: " . $room . "</span></a></div>";
+					}	
 				}
 			} else {
-				echo("No Results for '" . $search . "'");
+				echo("No staff member results for '" . $search . "'");
 			}
 
 			?>

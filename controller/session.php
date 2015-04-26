@@ -17,8 +17,10 @@ if(strpos($user_check, "b00") !== false) {
 
 $query = mysqli_query($connect, $sql);
 
-$row = mysqli_fetch_assoc($query);
-$login_session = $row['first_name'] . ' ' . $row['surname'];
+if(mysqli_num_rows($query) !== 0) {
+	$row = mysqli_fetch_assoc($query);
+	$login_session = $row['first_name'] . ' ' . $row['surname'];
+}
 
 
 if(!isset($user_check) || ($user_check !== 'e00000' && $access === 'restricted')) {

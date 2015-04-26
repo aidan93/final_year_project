@@ -12,12 +12,15 @@ if(isset($_GET["user"])) {
 	$user_profile = $_GET["user"];
 
 	if(strpos($user_profile, "b00") !== false && strpos($_SESSION['login_user'], "b00") === false) {
+		
 		//if staff try to access student page send them back to their home page
 		header("location: http://".$_SERVER['HTTP_HOST']."/project/views/profile.php?user=" . $_SESSION['login_user']);
 	} else if(strpos($user_profile, "b00") !== false && strpos($_SESSION['login_user'], "b00") !== false && $_SESSION['login_user'] !== $user_profile) {
+		
 		//if student tries to access another student page send them back to their home page
 		header("location: http://".$_SERVER['HTTP_HOST']."/project/views/profile.php?user=" . $_SESSION['login_user']);
 	} else if(strpos($user_profile, "b00") === false && strpos($_SESSION['login_user'], "b00") === false && $_SESSION['login_user'] !== $user_profile) {
+		
 		//if staff member tries to access another staff member's page send them back to their home page
 		header("location: http://".$_SERVER['HTTP_HOST']."/project/views/profile.php?user=" . $_SESSION['login_user']);
 	} else {
@@ -27,7 +30,7 @@ if(isset($_GET["user"])) {
 			$sql = "SELECT first_name, surname, availability FROM staff WHERE staff_id = '$user_profile'";
 		}
 
-		$query = mysqli_query($connect, $sql) or die (mysqli_error($connect));
+		$query = mysqli_query($connect, $sql);
 		
 		// Run a quick check to verify there are any results
 		$quick_check = mysqli_num_rows($query);
@@ -71,13 +74,13 @@ if(isset($_GET["user"])) {
 	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/jquery-ui.min.js"></script>
 	<script type="text/javascript" src="/project/js/jquery.dotdotdot.min.js"></script>
 	<script type="text/javascript" src="/project/js/create_event.js"></script>
-	<script type="text/javascript" src="/project/js/post.js"></script>
 	<script type="text/javascript" src="/project/js/legend.js"></script>
-
 	<!-- Only available for staff viewing their own profile -->
 	<?php if($_SESSION['login_user'] === $user_profile && strpos($_SESSION['login_user'], "b00") === false) { ?>
 		<script type="text/javascript" src="/project/js/availability.js"></script>
 	<?php } ?>
+
+	<script type="text/javascript" src="/project/js/post.js"></script>
 </head>
 <body>
 	<div class="overlay"></div>
@@ -95,20 +98,25 @@ if(isset($_GET["user"])) {
 		<?php } ?>
 	</div>
 	<div class="wrapper">
-		<h2 id="profile_header"><?php echo $name ?>'s Profile</h2>
+		<?php if($_SESSION['login_user'] === $user_profile) { ?>
+			<h2 id="profile_header">Your Profile</h2>
+		<?php } else { ?>
+			<h2 id="profile_header"><?php echo $name ?>'s Profile</h2>
+		<?php } ?>
 		<?php if(strpos($user_profile, "b00") === false) { ?>
 			<div id="availability">
+				<!-- If logged in user is a staff member and viewing their own profile, make availability clickable to change -->
 				<?php if($_SESSION['login_user'] === $user_profile && strpos($_SESSION['login_user'], "b00") === false) { 
 						if($avail === '0') { ?>
-							<a href="#"><span class='busy'>Busy</span></a>
+							<a href="#"><span class='busy'>Currently Busy</span></a>
 						<?php } else { ?>
-							<a href="#"><span class='available'>Available</span></a>
+							<a href="#"><span class='available'>Currently Available</span></a>
 						<?php } ?>
 				<?php } else {
 						if($avail === '0') { ?>
-							<span class='busy'>Busy</span>
+							<span class='busy'>Currently Busy</span>
 						<?php } else { ?>
-							<span class='available'>Available</span>
+							<span class='available'>Currently Available</span>
 						<?php } ?>
 				<?php } ?>
 			</div>
@@ -128,7 +136,7 @@ if(isset($_GET["user"])) {
 		<?php if(strpos($_SESSION['login_user'], "b00") === false && $_SESSION['login_user'] === $user_profile) { ?>
 			<div id="staff_controls">
 				<button type="button" id="staff_add_event">Create New Event</button>
-				<a href="/project/views/delay_view.php?user=<?php echo $user_profile; ?>" id="delay_button" class="button">Delay Event</a>
+				<a href="/project/views/delay_view.php?user=<?php echo $user_profile; ?>" id="delay_button" class="button">Delay Upcoming Event</a>
 			</div>
 		<?php } ?>
 			<button type="button" id="cal_legend">Legend</button>

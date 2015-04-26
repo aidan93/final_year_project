@@ -13,9 +13,9 @@ $(document).ready(function() {
 	});
 
 	//redirects back to the calendar
-	$("#back").click(function(){
+	$("#back.delay-back").click(function(){
 		parent.history.back();
-		return false;
+        return false;
 	});
 
 

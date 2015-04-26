@@ -46,7 +46,7 @@ if(isset($_SESSION['login_user'])) {
 				$sql = "INSERT INTO oauth_token (access_token, token_type, expires_in, refresh_token, created, staff_id, student_id) VALUES ('$token_access', '$token_type', '$token_expire', '$token_refresh', '$token_created', '$token_user', NULL)";
 			}
 			
-			$query = mysqli_query($connect, $sql) or die (mysqli_error($connect));
+			$query = mysqli_query($connect, $sql);
 
 			//get todays date and check if the user has any events scheduled for today or in the future
 			$dateNow = date('Y-m-d');
@@ -56,7 +56,7 @@ if(isset($_SESSION['login_user'])) {
 				$upcoming_events = "SELECT * FROM events WHERE staff_id = '$token_user' AND event_date >= '$dateNow' AND status = 1";
 			}
 			
-			$event_query = mysqli_query($connect, $upcoming_events) or die (mysqli_error($connect));
+			$event_query = mysqli_query($connect, $upcoming_events);
 			$quick_check = mysqli_num_rows($event_query);
 
 			//check to make sure events exist
@@ -78,7 +78,7 @@ if(isset($_SESSION['login_user'])) {
 						$user_name = "SELECT first_name, surname FROM student WHERE student_id = '$user'";
 					}
 
-					$user_query = mysqli_query($connect, $user_name) or die (mysqli_error($connect));
+					$user_query = mysqli_query($connect, $user_name);
 					$check = mysqli_num_rows($user_query);
 
 					//make sure the user exists before adding the name
@@ -130,7 +130,7 @@ if(isset($_SESSION['login_user'])) {
 					//apply created events id to the database for consistency
 					if(isset($createdEvent) && isset($gcal_id)) {
 						$sql = "UPDATE events SET cal_event_id = '$gcal_id' WHERE staff_id = '$staff' AND event_date = '$date' AND start_time = '$start_time' AND end_time = '$end_time'";
-						$update_query = mysqli_query($connect, $sql) or die (mysqli_error($connect));
+						$update_query = mysqli_query($connect, $sql);
 					}
 				}
 			}
@@ -142,7 +142,7 @@ if(isset($_SESSION['login_user'])) {
 	//check if user has already set up their google calendar
 	$user = $_SESSION['login_user'];
 	$sql = "SELECT staff_id, student_id FROM oauth_token WHERE staff_id = '$user' OR student_id = '$user'";
-	$query = mysqli_query($connect, $sql) or die (mysqli_error($connect));
+	$query = mysqli_query($connect, $sql);
 	$num_rows = mysqli_num_rows($query);
 
 	// if token does not exist in db then set up link

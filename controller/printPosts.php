@@ -3,7 +3,7 @@
 require_once($_SERVER['DOCUMENT_ROOT'].'/project/controller/connect.php');
 
 $sql = "SELECT * FROM posts WHERE staff_id = '$user_profile' ORDER BY time_created DESC LIMIT 5";
-$query = mysqli_query($connect, $sql) or die (mysqli_error($connect));
+$query = mysqli_query($connect, $sql);
 
 if(mysqli_num_rows($query) > 0) {
 

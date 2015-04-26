@@ -50,8 +50,8 @@ if(isset($_GET['status'])) {
 
 		<form action='/project/controller/admin_add_user.php' method='post'>
 		<li class='form_row'><label for='id' class='form_title'>Staff ID:</label><input type='text' name='id' required></li>
-		<li class='form_row'><label for='first_name' class='form_title'>First Name:</label><input type='text' name='first_name' required></li>
-		<li class='form_row'><label for='surname' class='form_title'>Surname:</label><input type='text' name='surname' required></li>
+		<li class='form_row'><label for='first_name' class='form_title'>First Name:</label><input type='text' name='first_name' pattern='[A-Za-z\\s]*' required></li>
+		<li class='form_row'><label for='surname' class='form_title'>Surname:</label><input type='text' name='surname' pattern='[A-Za-z\\s]*' required></li>
 		<li class='form_row'><label for='room' class='form_title'>Room:</label><input type='text' name='room' required></li>
 		<li class='form_row'><label for='email' class='form_title'>Email: </label><input type='email' name='email' required></li>
 		<li class='form_row'><label for='password' class='form_title'>Password:</label><input type='password' name='password' required></li>
@@ -66,8 +66,8 @@ if(isset($_GET['status'])) {
 
 		<form action='/project/controller/admin_add_user.php' method='post'>
 		<li class='form_row'><label for='id' class='form_title'>Student ID:</label><input type='text' name='id' required></li>
-		<li class='form_row'><label for='first_name' class='form_title'>First Name:</label><input type='text' name='first_name' required></li>
-		<li class='form_row'><label for='surname' class='form_title'>Surname:</label><input type='text' name='surname' required></li>
+		<li class='form_row'><label for='first_name' class='form_title'>First Name:</label><input type='text' name='first_name' pattern='[A-Za-z\\s]*' required></li>
+		<li class='form_row'><label for='surname' class='form_title'>Surname:</label><input type='text' name='surname' pattern='[A-Za-z\\s]*' required></li>
 		<li class='form_row'><label for='course' class='form_title'>Course:</label><input type='text' name='course' required></li>
 		<li class='form_row'><label for='email' class='form_title'>Email: </label><input type='email' name='email' required></li>
 		<li class='form_row'><label for='password' class='form_title'>Password:</label><input type='password' name='password' required></li>
@@ -75,6 +75,7 @@ if(isset($_GET['status'])) {
 		<input type='submit'></form>
 	</div>
 
+	<!-- Popup box that appears to search for users -->
 	<div id="search-popup">
 		<a href="#" class="close-popup"><img src="/project/images/close-icon.png" /></a>
 		<div id="searchform"> 
@@ -83,6 +84,7 @@ if(isset($_GET['status'])) {
 		</div> 
 	</div>
 
+	<!-- Popup box that appears to display user data upon search -->
 	<div id="popup">
 		<a href="#" class="close-popup"><img src="/project/images/close-icon.png" /></a>
 	</div>

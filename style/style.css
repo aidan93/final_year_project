@@ -202,7 +202,6 @@ textarea {
 	font-weight: normal;
 	padding: 20px 10px;
 	background: none repeat scroll 0% 0% #bba461;
-	border-radius: 30px 30px 0px 0px;
 	color: #fff;
 }
 
@@ -455,6 +454,7 @@ a.button:hover {
     border:1px solid #aaa;
     box-shadow: 0px 0px 3px #ccc, 0 10px 15px #eee inset;
     border-radius:2px;
+    font-size: 0.8em;
     -moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
@@ -1013,7 +1013,7 @@ body.login {
 	text-decoration: none;
 	color: #fff;
 	background: #3078f0 url('/project/images/google.png') no-repeat left;
-	padding: 5px 10px 5px 35px;
+	padding: 6px 10px 6px 35px;
 	font-size: 0.8em;
 	border-radius: 3px;
     -webkit-border-radius: 3px;
@@ -1021,6 +1021,7 @@ body.login {
     -ms-border-radius: 3px;
     -o-border-radius: 3px;
     margin-left: 10px;
+    margin-bottom: 20px;
 }
 
 /* User's Profile Header */
@@ -1165,7 +1166,7 @@ body.login {
 #availability {
 	display: block;
 	clear: both;
-	width: 100px;
+	width: 160px;
 	margin: 0 auto 30px;
 	text-align: center;
 }
@@ -1357,6 +1358,7 @@ body.login {
 	.clmonth caption {
 		font-size: 1.6em;
 		padding: 10px 0;
+		border-bottom: 10px solid #fff;
 	}
 	.clmonth caption .month {
 		display: inline-block;
@@ -1405,5 +1407,13 @@ body.login {
 
 	#events #event_times .timeslot select {
 		padding-right: 14px;
+	}
+
+	#staff_controls,
+	#google_login,
+	#cal_legend {
+		clear: both;
+		float: left;
+		margin-left: 0;
 	}
 }

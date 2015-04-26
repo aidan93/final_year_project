@@ -19,37 +19,41 @@ if($selected_start_init && $selected_end_init) {
 	$start_time = strtotime($selected_start_init);
 	$end_time = strtotime($selected_end_init);
 
+	//If the new start time of the delayed event is at least 10 minutes before the end time then update database record with new start time
 	if(strtotime('+10 minutes', $new_start) <= $end_time) {
 		$new_start = date('H:i:s', $new_start);
 		$start_time = date('H:i:s', $start_time);
 		$end_time = date('H:i:s', $end_time);
 		$sql = "UPDATE events SET start_time = '$new_start' WHERE staff_id = '$user' AND event_date = '$date' AND start_time = '$start_time' AND end_time = '$end_time'";
-		$query = mysqli_query($connect, $sql) or die (mysqli_error($connect));
+		$query = mysqli_query($connect, $sql);
 	} else {
-		die("Event has exceeded the maximum 20 minute delay.");
+		//If new start time is less than 10 minutes before the end time then display an error indicating that the delay duration has been exceeded
+		$start_time = date('H:i', $start_time);
+		echo "/project/views/event_confirmation.php?status=Exceeded&date=" . $date . "&start=" . $start_time;
 	}
 
 	if($query) {
 
-		$scriptUri = 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'];
-
-		$client = new Google_Client();
-		$client->setApplicationName("UUJ Electronic Noticeboard");
-		$client->setDeveloperKey("AIzaSyD53jSGvnzDRwQxzHGIu6viFmGjFGzIQXA");  
-		$client->setClientId('522850139708-ke5b3r8m9sqtt1fbhr6aleg1d5m5hso9.apps.googleusercontent.com');
-		$client->setClientSecret('ND8xIzcEL3CNcHZsHeqM9zqM');
-		$client->setRedirectUri($scriptUri);
-
-		$client->setScopes(array('https://www.googleapis.com/auth/calendar'));
-
 		$sql = "SELECT * FROM oauth_token WHERE staff_id = '$user'";
 		
-		$query = mysqli_query($connect, $sql) or die (mysqli_error($connect));
+		$query = mysqli_query($connect, $sql);
 
 		// Run a quick check to verify if this user has their gcal linked
 		$quick_check = mysqli_num_rows($query);
 
 		if($quick_check !== 0) {
+
+			//Establish connection to system's Google calendar project
+			$scriptUri = 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'];
+			$client = new Google_Client();
+			$client->setApplicationName("UUJ Electronic Noticeboard");
+			$client->setDeveloperKey("AIzaSyD53jSGvnzDRwQxzHGIu6viFmGjFGzIQXA");  
+			$client->setClientId('522850139708-ke5b3r8m9sqtt1fbhr6aleg1d5m5hso9.apps.googleusercontent.com');
+			$client->setClientSecret('ND8xIzcEL3CNcHZsHeqM9zqM');
+			$client->setRedirectUri($scriptUri);
+			$client->setScopes(array('https://www.googleapis.com/auth/calendar'));
+
+			//Get user's oauth details and add them to an array to send request to Google
 			$row = mysqli_fetch_assoc($query);
 			$token_access = $row['access_token'];
 			$token_type = $row['token_type'];
@@ -60,21 +64,22 @@ if($selected_start_init && $selected_end_init) {
 			
 			$array = array('access_token'=>$token_access, 'token_type'=>$token_type, 'expires_in'=>$token_expire, 'refresh_token'=>$token_refresh, 'created'=>$token_created);
 
+			//If user's access token is expired, retrieve a new access token and update both the database record and array
 			if($client->isAccessTokenExpired()) {
 				$client->refreshToken($token_refresh);
 		        $newtoken = $client->getAccessToken();
 		        $token = json_decode($newtoken ,true);
 				$token_access = $token['access_token'];
 		        $tokenupdate = "UPDATE oauth_token SET access_token = '$token_access' WHERE refresh_token = '$token_refresh' AND staff_id = '$token_user'";
-		        mysqli_query($connect, $tokenupdate) or die (mysqli_error($connect));
+		        mysqli_query($connect, $tokenupdate);
 
 		        $replacement = array('access_token'=>$token_access);
 		        $array = array_replace($array, $replacement);
 			}
 
+			//Encode the array to a json array and gain access to the user's Google calendar
 			$token = json_encode($array);
 			$client->setAccessToken($token);
-
 			$service = new Google_Service_Calendar($client);
 
 			//Get gcal id after update
@@ -105,6 +110,7 @@ if($selected_start_init && $selected_end_init) {
 				$gcal_start_time = date('H:i:s', $gcal_start_time);
 				$gcal_end_time = date('H:i:s', $gcal_end_time);
 
+				//If delayed event is at the beginning of the Google event then delay the whole Google event by the delay duration
 				if($start_time === $gcal_start_time) {
 					$gcal_start_time = $date . 'T' . $new_start;
 
@@ -160,7 +166,7 @@ if($selected_start_init && $selected_end_init) {
 						$gcal_id = $createdEvent->getId();
 
 						$update_events = "UPDATE events SET cal_event_id = '$gcal_id' WHERE staff_id = '$token_user' AND event_date = '$date' AND start_time <= '$new_start' AND end_time >= '$gcal_end_time'";
-						$update = mysqli_query($connect, $update_events) or die (mysqli_error($connect));
+						$update = mysqli_query($connect, $update_events);
 					}
 
 				}
@@ -184,7 +190,7 @@ if($selected_start_init && $selected_end_init) {
 
 		//Get student ID from event if it exists
 		$sql = "SELECT student_id FROM events WHERE staff_id = '$user' AND event_date = '$date' AND start_time = '$new_start' AND end_time = '$end_time'";
-		$student_check = mysqli_query($connect, $sql) or die (mysqli_error($connect));
+		$student_check = mysqli_query($connect, $sql);
 
 		if(mysqli_num_rows($student_check) !== 0) {
 			$row = mysqli_fetch_assoc($student_check);
@@ -195,12 +201,22 @@ if($selected_start_init && $selected_end_init) {
 				$student = $row['student_id'];
 				$sql = "SELECT * FROM oauth_token WHERE student_id = '$student'";
 	
-				$query = mysqli_query($connect, $sql) or die (mysqli_error($connect));
+				$query = mysqli_query($connect, $sql);
 
 				// Run a quick check to verify if this user has their gcal linked
 				$quick_check = mysqli_num_rows($query);
 
 				if($quick_check !== 0) {
+
+					//Establish connection to system's Google calendar project
+					$scriptUri = 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'];
+					$client = new Google_Client();
+					$client->setApplicationName("UUJ Electronic Noticeboard");
+					$client->setDeveloperKey("AIzaSyD53jSGvnzDRwQxzHGIu6viFmGjFGzIQXA");  
+					$client->setClientId('522850139708-ke5b3r8m9sqtt1fbhr6aleg1d5m5hso9.apps.googleusercontent.com');
+					$client->setClientSecret('ND8xIzcEL3CNcHZsHeqM9zqM');
+					$client->setRedirectUri($scriptUri);
+					$client->setScopes(array('https://www.googleapis.com/auth/calendar'));
 
 					$row = mysqli_fetch_assoc($query);
 					$token_access = $row['access_token'];
@@ -218,7 +234,7 @@ if($selected_start_init && $selected_end_init) {
 				        $token = json_decode($newtoken ,true);
 						$token_access = $token['access_token'];
 				        $tokenupdate = "UPDATE oauth_token SET access_token = '$token_access' WHERE refresh_token = '$token_refresh' AND student_id = '$token_user'";
-				        mysqli_query($connect, $tokenupdate) or die (mysqli_error($connect));
+				        mysqli_query($connect, $tokenupdate);
 
 				        $replacement = array('access_token'=>$token_access);
 				        $array = array_replace($array, $replacement);
@@ -246,7 +262,7 @@ if($selected_start_init && $selected_end_init) {
 			}
 		}
 
-		echo "/project/views/event_confirmation.php?status=Delayed&date=" . $date . "&start=" . $start_time . "&delay=" . $delay . "&student=" . $student;
+		echo "/project/views/event_confirmation.php?status=Delayed&date=" . $date . "&start=" . $start_time . "&delay=" . $delay;
 	}
 }
 

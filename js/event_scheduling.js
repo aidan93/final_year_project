@@ -17,15 +17,44 @@ $(document).ready(function() {
 
 	//redirects back to the calendar
 	$("#cancel, #back").click(function(){
-		history.back();
-		return false;
+		parent.history.back();
+        return false;
 	});
 
 	/* 
 	** when user confirms timeslot, the date, start and end times are sent to get_selected_event.php 
 	** which gets the relevant data from the database and displays it in the popup div in a form
 	*/
-	$("#confirm, .view_event").click(function(event){
+	$("#confirm").click(function(event){
+		if($(".timeslot").hasClass('selected')) {
+			$.ajax({
+			  type: 'POST',
+			  url: '/project/controller/get_selected_event.php',
+			  data: {
+			  	user: $(".timeslot.selected").attr('data-user-profile'), 
+			  	date: $(".timeslot.selected").attr('data-date'),
+			  	selected_start: $(".timeslot.selected .start_time").text(),
+			  	selected_end: $(".timeslot.selected .end_time").text()
+			  },
+			  success: function(data){
+		        $("#popup").append(data);
+		        $(".overlay").fadeIn();
+				$("#popup").fadeIn();
+		      },
+		      error: function(xhr, status, error){
+		        console.log(error);
+		      }
+			});
+		} else {
+			alert('Please select an event.');
+		}
+	});
+
+	/*
+	** when user clicks the view button beside an event, a popup displays with the event information
+	** this is different from the confirm button as it displays a hidden edit input field for the student
+	*/
+	$(".view_event").click(function(event){
 		$.ajax({
 		  type: 'POST',
 		  url: '/project/controller/get_selected_event.php',
@@ -33,7 +62,8 @@ $(document).ready(function() {
 		  	user: $(".timeslot.selected").attr('data-user-profile'), 
 		  	date: $(".timeslot.selected").attr('data-date'),
 		  	selected_start: $(".timeslot.selected .start_time").text(),
-		  	selected_end: $(".timeslot.selected .end_time").text()
+		  	selected_end: $(".timeslot.selected .end_time").text(),
+		  	status: 'edit'
 		  },
 		  success: function(data){
 	        $("#popup").append(data);

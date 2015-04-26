@@ -15,7 +15,7 @@
 		$sql = "SELECT * FROM staff WHERE staff_id='$user'";
 	}
 
-	$query = mysqli_query($connect, $sql) or die (mysqli_error($connect));
+	$query = mysqli_query($connect, $sql);
 
 	if(mysqli_num_rows($query) === 1) {
 		if(strpos($user, "b00") !== false) {
@@ -24,7 +24,7 @@
 			$delete_user = "DELETE FROM staff WHERE staff_id = '$user'";
 		}
 		
-		$delete_query = mysqli_query($connect, $delete_user) or die (mysqli_error($connect));
+		$delete_query = mysqli_query($connect, $delete_user);
 
 		if($delete_query) {
 			echo "/project/admin.php?status=deleted";
